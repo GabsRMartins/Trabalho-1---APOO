@@ -16,7 +16,7 @@ class MapPage(tk.Frame):
             loading="lazy"
             allowfullscreen
             referrerpolicy="no-referrer-when-downgrade"
-            src="https://www.google.com/maps/embed/v1/place?key=AIzaSyAfWpbtUjNOrUi970MYcF8wmtcfO_h-TFQ&q=Belo+Horizonte">
+            src="https://www.google.com/maps/embed/v1/place?key=AQ&q=Belo+Horizonte">
         </iframe>
         """
         html_label = HTMLLabel(self, html=html_code)
