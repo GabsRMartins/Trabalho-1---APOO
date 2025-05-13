@@ -23,7 +23,7 @@ class AppRouter(tk.Tk):
             frame.grid(row=0, column=0, sticky="nsew")
 
         self.show_frame("HomePage")
-        self.show_frame("MapPage")
+       
 
     def show_frame(self, page_name):
         frame = self.frames[page_name]
