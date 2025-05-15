@@ -14,7 +14,7 @@ class Base_Dados:
 
     def executa_script(self) -> None:
         #executa o arquivo .sql
-        with open('base_de_dados/role_dia_db.sql', 'r') as file:
+        with open('base_de_dados/{}.sql'.format(self.db_name), 'r') as file:
             script = file.read()
         self.__cursor.executescript(script)
         self.__connection.commit()
