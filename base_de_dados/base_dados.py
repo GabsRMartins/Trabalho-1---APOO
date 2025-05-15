@@ -1,24 +1,27 @@
 import sqlite3
+import os
 
 class Base_Dados:
-    def __init__(self):#inicializa a conexão com o banco de dados
-        self.db_name = 'role_dia_db'
+    def __init__(self):
+        self.db_name = os.path.join(os.path.dirname(__file__), 'role_dia_db.db')
         self.connection = None
 
-    def connect(self):#estabelece a conexão com o banco de dados
+    def connect(self):
         try:
             self.connection = sqlite3.connect(self.db_name)
             print(f"Conexão com o banco '{self.db_name}' foi estabelecida com sucesso.")
         except sqlite3.Error as e:
             print(f"Erro ao conectar ao banco: {e}")
 
-    def execute_script(self):#executa o arquivo .sql
+    def execute_script(self):
         try:
-            with open('base_de_dados/role_dia_db.sql', 'r') as file:
+            script_path = os.path.join(os.path.dirname(__file__), 'role_dia_db.sql')
+            with open(script_path, 'r', encoding='utf-8') as file:
                 script = file.read()
             cursor = self.connection.cursor()
             cursor.executescript(script)
             self.connection.commit()
+            print("Script SQL executado com sucesso.")
         except sqlite3.Error as e:
             print(f"Erro ao executar o script SQL: {e}")
 
@@ -30,7 +33,8 @@ class Base_Dados:
                 VALUES (?, ?, ?, ?)
             """, (nome, email, senha, tipo_usuario))
             self.connection.commit()
-        except mysql.connector.Error as e:
+            print("Usuário adicionado com sucesso.")
+        except sqlite3.Error as e:
             print(f"Erro ao adicionar usuário: {e}")
 
     def add_evento(self, nome_evento, local_evento, organizadora, id_usuario):
@@ -41,31 +45,40 @@ class Base_Dados:
             VALUES (?, ?, ?, ?)
             """, (nome_evento, local_evento, organizadora, id_usuario))
             self.connection.commit()
-        except mysql.connector.Error as e:
+            print("Evento adicionado com sucesso.")
+        except sqlite3.Error as e:
             print(f"Erro ao adicionar evento: {e}")
 
-    def get_usuario(self):
+    def get_usuario(self, nome):
         try:
             cursor = self.connection.cursor()
-            cursor.execute("SELECT * FROM usuario ")
-            return cursor.fetchone()
+            cursor.execute("SELECT * FROM usuario WHERE nome = ?", (nome,))
+            return cursor.fetchall()
         except sqlite3.Error as e:
-            print(f"Erro ao buscar usuário com ID {user_id}: {e}")
-            return None
+            print(f"Erro ao buscar usuário por nome: {e}")
+            return []
+        
+    def get_senha(self, senha):
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("SELECT * FROM usuario WHERE senha = ?", (senha,))
+            return cursor.fetchall()
+        except sqlite3.Error as e:
+            print(f"Erro ao buscar usuário por nome: {e}")
+            return []
+            
+    def cadastrar(self, username, email, password,  tipo):
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("""
+            INSERT INTO usuario (nome, email, senha, tipo_usuario)
+            VALUES (?, ?, ?, ?)
+            """, (username, email, password,  tipo))
+            self.connection.commit()
+        except sqlite3.Error as e:
+            print(f"Erro ao cadastrar usuário: {e}")
 
-    def close(self): #encerra a conexão com o banco de dados
+    def close(self):
         if self.connection:
             self.connection.close()
-
-# # Exemplo de uso
-# db_manager = Base_Dados()
-# db_manager.connect()
-# db_manager.execute_script()
-# # db_manager.add_evento(
-# #     nome_evento='Workshop de Tecnologia',
-# #     local_evento='Auditório da UFMG',
-# #     organizadora='Elaine Santos',
-# #     id_usuario=1  # Certifique-se de que o usuário com ID 1 existe
-# # )
-# db_manager.add_usuario('Carlos', 'carlos123@example.com', 'senha_segura123', 1)
-# db_manager.close()
+            print("Conexão com o banco encerrada.")
