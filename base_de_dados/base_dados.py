@@ -45,10 +45,3 @@ class Base_Dados:
         #encerra a conexão com o banco de dados
         if self.__connection:
             self.__connection.close()
-
-# db = Base_Dados('role_dia_db')
-# print(type(db.get_nome_usuario()))
-# print(db.get_nome_evento())
-# # nome = db.get_nome_usuario
-
-# # print(nome)
