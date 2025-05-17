@@ -1,54 +1,84 @@
 import sqlite3
+import os
 
 class Base_Dados:
-    def __init__(self, db_name:str) -> None:
-        #inicializa a conexão com o banco de dados
-        self._db_name = db_name
-        self.__connection = None
-        self.connect()
-        self.__cursor = self.__connection.cursor()
-        self.executa_script()
+    def __init__(self):
+        self.db_name = os.path.join(os.path.dirname(__file__), 'role_dia_db.db')
+        self.connection = None
 
-    def connect(self) -> None:
-        self.__connection = sqlite3.connect(self._db_name)
+    def connect(self):
+        try:
+            self.connection = sqlite3.connect(self.db_name)
+            print(f"Conexão com o banco '{self.db_name}' foi estabelecida com sucesso.")
+        except sqlite3.Error as e:
+            print(f"Erro ao conectar ao banco: {e}")
 
-    def executa_script(self) -> None:
-        #executa o arquivo .sql
-        with open('base_de_dados/{}.sql'.format(self.db_name), 'r') as file:
-            script = file.read()
-        self.__cursor.executescript(script)
-        self.__connection.commit()
+    def execute_script(self):
+        try:
+            script_path = os.path.join(os.path.dirname(__file__), 'role_dia_db.sql')
+            with open(script_path, 'r', encoding='utf-8') as file:
+                script = file.read()
+            cursor = self.connection.cursor()
+            cursor.executescript(script)
+            self.connection.commit()
+            print("Script SQL executado com sucesso.")
+        except sqlite3.Error as e:
+            print(f"Erro ao executar o script SQL: {e}")
 
-    def add_usuario(self, nome, email, senha, tipo_usuario) -> None:
-        self.__cursor.execute("""
-            INSERT INTO usuario (nome, email, senha, tipo_usuario) 
+    def add_usuario(self, nome, email, senha, tipo_usuario):
+        cursor = self.connection.cursor()
+        try:
+            cursor.execute("""
+                INSERT INTO usuario (nome, email, senha, tipo_usuario) 
+                VALUES (?, ?, ?, ?)
+            """, (nome, email, senha, tipo_usuario))
+            self.connection.commit()
+            print("Usuário adicionado com sucesso.")
+        except sqlite3.Error as e:
+            print(f"Erro ao adicionar usuário: {e}")
+
+    def add_evento(self, nome_evento, local_evento, organizadora, id_usuario):
+        cursor = self.connection.cursor()
+        try:
+            cursor.execute("""
+            INSERT INTO eventos (nome_evento, local_evento, organizadora, id_usuario) 
             VALUES (?, ?, ?, ?)
-        """, (nome, email, senha, tipo_usuario))
-        self.__connection.commit()
+            """, (nome_evento, local_evento, organizadora, id_usuario))
+            self.connection.commit()
+            print("Evento adicionado com sucesso.")
+        except sqlite3.Error as e:
+            print(f"Erro ao adicionar evento: {e}")
 
-    def add_evento(self, nome_evento, local_evento, organizadora, id_usuario) -> None:
-        self.__cursor.execute("""
-        INSERT INTO eventos (nome_evento, local_evento, organizadora, id_usuario) 
-        VALUES (?, ?, ?, ?)
-        """, (nome_evento, local_evento, organizadora, id_usuario))
-        self.__connection.commit()
+    def get_usuario(self, nome):
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("SELECT * FROM usuario WHERE nome = ?", (nome,))
+            return cursor.fetchall()
+        except sqlite3.Error as e:
+            print(f"Erro ao buscar usuário por nome: {e}")
+            return []
+        
+    def get_senha(self, senha):
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("SELECT * FROM usuario WHERE senha = ?", (senha,))
+            return cursor.fetchall()
+        except sqlite3.Error as e:
+            print(f"Erro ao buscar usuário por nome: {e}")
+            return []
+            
+    def cadastrar(self, username, email, password,  tipo):
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("""
+            INSERT INTO usuario (nome, email, senha, tipo_usuario)
+            VALUES (?, ?, ?, ?)
+            """, (username, email, password,  tipo))
+            self.connection.commit()
+        except sqlite3.Error as e:
+            print(f"Erro ao cadastrar usuário: {e}")
 
-    def get_nome_usuario(self) -> str:
-        self.__cursor.execute("SELECT nome FROM usuario ")
-        return self.__cursor.fetchone()
-
-    def get_nome_evento(self) -> str:
-        self.__cursor.execute("SELECT nome_evento FROM eventos ")
-        return self.__cursor.fetchone()
-
-    def __del__(self) -> None: 
-        #encerra a conexão com o banco de dados
-        if self.__connection:
-            self.__connection.close()
-
-# db = Base_Dados('role_dia_db')
-# print(type(db.get_nome_usuario()))
-# print(db.get_nome_evento())
-# # nome = db.get_nome_usuario
-
-# # print(nome)
+    def close(self):
+        if self.connection:
+            self.connection.close()
+            print("Conexão com o banco encerrada.")
