@@ -16,3 +16,18 @@ CREATE TABLE IF NOT EXISTS eventos (
     criado_em DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_usuario) REFERENCES usuario(id) ON DELETE CASCADE
 );
+
+
+
+CREATE TABLE IF NOT EXISTS locais (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    rua TEXT NOT NULL,
+    bairro TEXT NOT NULL,
+    cep TEXT NOT NULL,
+    proximo_evento TEXT NOT NULL,
+    max_pessoas  INTEGER,
+    FOREIGN KEY (id_usuario) REFERENCES usuario(id) ON DELETE CASCADE
+);
+
+
+
