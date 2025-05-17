@@ -1,15 +1,16 @@
 from entity.Mapa import Mapa
+from entity.Entidade import Entidade
 
 class MapaService(Mapa):
 
     def __init__(self):
         pass
 
-    def addEntidade(self, entidade):
-        super()._adicionar_entidade
+    def adicionarEntidade(self, entidade: Entidade):
+        super()._adicionarEntidade(entidade)
 
-    def delEntidade(self, entidade):
-        super()._adicionar_entidade
+    def removerEntidade(self, entidade: Entidade):
+        super()._removerEntidade(entidade)
 
-    def retornaMapa(self):
-        super()._retornar_mapa()
+    def retornarMapa(self):
+        super()._retornarMapa()

@@ -5,3 +5,4 @@ class Entidade(ABC):
     @abstractmethod
     def print(self):
         pass
+

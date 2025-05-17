@@ -9,9 +9,9 @@ class Usuario:
     def __init__(self, nome, senha, tipo):
         self.nome = nome
         self.senha = senha
-        self.__tipo = self._converter_tipo(tipo)
+        self.__tipo = self._converterTipo(tipo)
 
-    def _converter_tipo(self, tipo_codigo: int) -> tipoUsuario:
+    def _converterTipo(self, tipo_codigo: int) -> tipoUsuario:
         if tipo_codigo == 1:
             return tipoUsuario.COMUM
         elif tipo_codigo == 2:
