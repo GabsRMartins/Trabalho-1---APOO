@@ -14,3 +14,4 @@ class Promotor(Usuario):
         return evento
 
     def _removerEvento(self, evento):            
+        evento.removerEvento()
