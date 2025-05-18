@@ -66,24 +66,44 @@ class HomePage(tk.Frame):
         )
         self.btn_cadastro.grid(row=6, column=0, columnspan=2)
 
-        self.btn_ir_sobre = tk.Button(self.frame, text="Ir para Mapa", command=lambda: self.controller.show_frame("MapPage"))
-        self.btn_ir_sobre.grid(row=7, column=0, columnspan=2, pady=10)
 
         self.nome_shown = False
 
+    def mostrar_formulario_login(self):
+        self.label_nome.grid_forget()
+        self.entry_nome.grid_forget()
+        self.label_email.grid_forget()
+        self.entry_email.grid_forget()
+        self.label_tipo.grid_forget()
+        self.combo_tipo.grid_forget()
+
+        self.label_usuario.grid(row=1, column=0, sticky="w", pady=(10, 0))
+        self.entry_usuario.grid(row=1, column=1, pady=5)
+
+        self.btn_cadastro.config(text="Cadastrar")
+        self.nome_shown = False
+
+
+    def mostrar_formulario_cadastro(self):
+        self.label_nome.grid(row=1, column=0, sticky="w", pady=(10, 0))
+        self.entry_nome.grid(row=1, column=1, pady=5)
+
+        self.label_email.grid(row=2, column=0, sticky="w")
+        self.entry_email.grid(row=2, column=1, pady=(0, 10))
+
+        self.label_tipo.grid(row=3, column=0, sticky="w")
+        self.combo_tipo.grid(row=3, column=1, pady=5)
+
+        self.label_usuario.grid_forget()
+        self.entry_usuario.grid_forget()
+
+        self.btn_cadastro.config(text="Finalizar Cadastro")
+        self.nome_shown = True
+
 
     def fazer_login(self):
-         
         if self.nome_shown:
-           self.label_nome.grid_forget()
-           self.entry_nome.grid_forget()
-           self.label_email.grid_forget()
-           self.entry_email.grid_forget()
-           self.entry_tipo.grid_forget()
-
-           self.label_usuario.grid(row=1, column=0, sticky="w", pady=(10, 0))
-           self.entry_usuario.grid(row=1, column=1, pady=5)
-           self.nome_shown = False
+            self.mostrar_formulario_login()
 
         usuario = self.entry_usuario.get()
         senha = self.entry_senha.get()
@@ -93,27 +113,13 @@ class HomePage(tk.Frame):
             messagebox.showerror("Erro", f"{resultado['error']}\n{resultado.get('details', '')}")
         else:
             token = resultado.get("token", "Token não fornecido")
-        messagebox.showinfo("Sucesso", f"Login realizado com sucesso!\nToken: {token}")
+            messagebox.showinfo("Sucesso", f"Login realizado com sucesso!\nToken: {token}")
+            self.controller.show_frame("MapPage")  
 
 
     def fazer_cadastro(self):
         if not self.nome_shown:
-            # Mostrar campos novos
-            self.label_nome.grid(row=1, column=0, sticky="w", pady=(10, 0))
-            self.entry_nome.grid(row=1, column=1, pady=5)
-
-            self.label_email.grid(row=2, column=0, sticky="w")
-            self.entry_email.grid(row=2, column=1, pady=(0, 10))
-
-            self.label_tipo.grid(row=3, column=0, sticky="w")
-            self.combo_tipo.grid(row=3, column=1, pady=5)
-
-            # Esconder campo de login
-            self.label_usuario.grid_forget()
-            self.entry_usuario.grid_forget()
-
-            self.nome_shown = True
-            self.btn_cadastro.config(text="Finalizar Cadastro")
+            self.mostrar_formulario_cadastro()
         else:
             nome = self.entry_nome.get()
             email = self.entry_email.get()
@@ -128,6 +134,7 @@ class HomePage(tk.Frame):
                 messagebox.showerror("Erro", f"{resultado['error']}\n{resultado.get('details', '')}")
             else:
                 messagebox.showinfo("Cadastro", "Cadastro realizado com sucesso!")
+                self.mostrar_formulario_login()
 
 
     def atualizar_imagem(self, event):

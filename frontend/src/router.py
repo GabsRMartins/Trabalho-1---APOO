@@ -5,7 +5,7 @@ from TelaMapa import MapPage
 class AppRouter(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("Aplicação com Router")
+        self.title("Role do Dia")
         self.state("zoomed")  # Maximiza a janela
         self.attributes("-alpha", 0.97)
 

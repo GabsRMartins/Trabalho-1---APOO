@@ -25,8 +25,7 @@ CREATE TABLE IF NOT EXISTS locais (
     bairro TEXT NOT NULL,
     cep TEXT NOT NULL,
     proximo_evento TEXT NOT NULL,
-    max_pessoas  INTEGER,
-    FOREIGN KEY (id_usuario) REFERENCES usuario(id) ON DELETE CASCADE
+    max_pessoas  INTEGER
 );
 
 
