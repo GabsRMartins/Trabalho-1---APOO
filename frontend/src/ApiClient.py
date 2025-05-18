@@ -7,7 +7,7 @@ class ApiClient:
 
     def login(self, usuario, senha):
         url = f"{self.base_url}/login"
-        payload = {"usuario": usuario, "senha": senha}
+        payload = {"username": usuario, "password": senha}
         try:
             response = requests.post(url, json=payload)
             response.raise_for_status()  # Lança exceção para códigos 4xx e 5xx
