@@ -1,6 +1,9 @@
 import tkinter as tk
 from tkinter import ttk
+from TelaInicial import HomePage
 from PIL import Image, ImageTk
+from ApiClient import ApiClient
+
 
 class Evento:
     def __init__(self, nome, horario, local, preco):
@@ -10,11 +13,11 @@ class Evento:
         self.preco = preco
 
 class TabelaEventosTela(tk.Frame):
-    def __init__(self, parent, eventos_originais):
+    def __init__(self, parent, controller):
         super().__init__(parent)
-        self.parent = parent
-        self.eventos_originais = eventos_originais
-        self.eventos_filtrados = list(eventos_originais) # Inicialmente, todos os eventos
+        self.eventos_originais = []
+        self.eventos_filtrados = list(self.eventos_originais) # Inicialmente, todos os eventos
+        self.api_client = ApiClient()
         self.form_bg = "#F9F9F9"
 
         try:
@@ -30,9 +33,31 @@ class TabelaEventosTela(tk.Frame):
         self.frame = tk.Frame(self, bg=self.form_bg, padx=20, pady=20)
         self.frame.place(relx=0.5, rely=0.5, anchor="center")
 
+        self.header_frame = tk.Frame(self.frame, bg=self.form_bg)
+        self.header_frame.pack(fill="x", pady=(0,10))
+
         self._criar_interface_filtro()
         self._criar_tabela()
         self._atualizar_tabela() # Exibe a tabela inicial
+
+        self.bem_vindo_label = tk.Label(
+            self.header_frame,
+            text=f"Bem vindo(a), Usuário!",
+            font=('Arial', 12, 'bold'),
+            bg="#F9F9F9",
+            anchor="w"
+        )
+        self.bem_vindo_label.pack(side="left", padx=15, pady=10)
+
+        self.logout_button = tk.Button(
+            self.header_frame,
+            text="Logout",
+            font=('Arial', 10, 'bold'),
+            bg="#E53935",
+            fg="white",
+            command= lambda : controller.show_frame(HomePage(self.parent, controller))
+        )
+        self.logout_button.pack(side="right", padx=15, pady=10)
 
     def _criar_interface_filtro(self):
         filtro_frame = tk.LabelFrame(self.frame, text="Filtrar Eventos", font=('Arial', 12), bg=self.form_bg, fg="#333333")
@@ -125,6 +150,16 @@ class TabelaEventosTela(tk.Frame):
         self.bg_photo = ImageTk.PhotoImage(imagem_opaca)
         self.bg_label.config(image=self.bg_photo)
 
+    # Essa função é apenas para simular a inserção de eventos. Usuários ativos não criam novos eventos.
+    def inserir_evento(self, evento):
+        self.eventos_originais.append(evento)
+        self.eventos_filtrados.append(evento)
+        self._atualizar_tabela()
+
+    # def logout(self):
+    #     # Definir o comportamento do logout (ir para a tela de login e cadastro)
+    #     self.parent.destroy()
+
 if __name__ == "__main__":
     root = tk.Tk()
     root.title("Tabela de Eventos com Filtro")
@@ -136,6 +171,14 @@ if __name__ == "__main__":
         Evento("Noite de Jazz", "21:00", "Café Central", 40.00),
         Evento("Workshop de Robótica", "10:00", "SENAI", 50.00)
     ]
-    app = TabelaEventosTela(root, eventos_exemplo)
+
+    controller = None
+
+    app = TabelaEventosTela(root, controller)
+
+    for evento in eventos_exemplo:
+
+        app.inserir_evento(evento)
+
     app.pack(fill="both", expand=True)
     root.mainloop()
