@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 from TelaInicial import HomePage
 from PIL import Image, ImageTk
 from ApiClient import ApiClient
@@ -16,12 +16,14 @@ class TabelaEventosTela(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent)
         self.eventos_originais = []
-        self.eventos_filtrados = list(self.eventos_originais) # Inicialmente, todos os eventos
+        self.eventos_filtrados = list(self.eventos_originais)
         self.api_client = ApiClient()
         self.form_bg = "#F9F9F9"
+        self.controller = controller
+        self.eventos_escolhidos = set()  # Armazena índices dos eventos escolhidos
 
         try:
-            self.original_image = Image.open("../assets/background_events.png") # Ajuste o caminho
+            self.original_image = Image.open("../assets/background_events.png")
         except FileNotFoundError:
             self.original_image = Image.new("RGB", (1, 1), "white")
 
@@ -35,10 +37,6 @@ class TabelaEventosTela(tk.Frame):
 
         self.header_frame = tk.Frame(self.frame, bg=self.form_bg)
         self.header_frame.pack(fill="x", pady=(0,10))
-
-        self._criar_interface_filtro()
-        self._criar_tabela()
-        self._atualizar_tabela() # Exibe a tabela inicial
 
         self.bem_vindo_label = tk.Label(
             self.header_frame,
@@ -55,34 +53,44 @@ class TabelaEventosTela(tk.Frame):
             font=('Arial', 10, 'bold'),
             bg="#E53935",
             fg="white",
-            command= lambda : controller.show_frame(HomePage(self.parent, controller))
+            command= lambda : controller.show_frame(HomePage(self.parent, controller)) if controller else self.parent.destroy()
         )
         self.logout_button.pack(side="right", padx=15, pady=10)
+
+        # Botão para ver eventos escolhidos
+        self.ver_eventos_button = tk.Button(
+            self.header_frame,
+            text="Ver Meus Eventos",
+            font=('Arial', 10, 'bold'),
+            bg="#43A047",
+            fg="white",
+            command=self.mostrar_eventos_escolhidos
+        )
+        self.ver_eventos_button.pack(side="right", padx=15, pady=10)
+
+        self._criar_interface_filtro()
+        self._criar_tabela()
+        self._atualizar_tabela()
 
     def _criar_interface_filtro(self):
         filtro_frame = tk.LabelFrame(self.frame, text="Filtrar Eventos", font=('Arial', 12), bg=self.form_bg, fg="#333333")
         filtro_frame.pack(pady=(0, 10), padx=10, fill="x")
 
-        # Filtro por Nome
         tk.Label(filtro_frame, text="Nome:", font=('Arial', 10), bg=self.form_bg).grid(row=0, column=0, padx=5, pady=5, sticky="w")
         self.nome_filtro = tk.StringVar()
         tk.Entry(filtro_frame, textvariable=self.nome_filtro, font=('Arial', 10), width=20).grid(row=0, column=1, padx=5, pady=5)
 
-        # Filtro por Local
         tk.Label(filtro_frame, text="Local:", font=('Arial', 10), bg=self.form_bg).grid(row=0, column=2, padx=5, pady=5, sticky="w")
         self.local_filtro = tk.StringVar()
         tk.Entry(filtro_frame, textvariable=self.local_filtro, font=('Arial', 10), width=20).grid(row=0, column=3, padx=5, pady=5)
 
-        # Filtro por Preço
         tk.Label(filtro_frame, text="Preço Máximo:", font=('Arial', 10), bg=self.form_bg).grid(row=0, column=4, padx=5, pady=5, sticky="w")
         self.preco_filtro = tk.StringVar()
         tk.Entry(filtro_frame, textvariable=self.preco_filtro, font=('Arial', 10), width=10).grid(row=0, column=5, padx=5, pady=5)
 
-        # Botão de Filtrar
         tk.Button(filtro_frame, text="Filtrar", font=('Arial', 10, 'bold'), bg="#2196F3", fg="white",
                   command=self._aplicar_filtro).grid(row=0, column=6, padx=10, pady=5)
 
-        # Botão para Limpar Filtro
         tk.Button(filtro_frame, text="Limpar Filtro", font=('Arial', 10), command=self._limpar_filtro).grid(row=1, column=0, columnspan=7, pady=5)
 
     def _criar_tabela(self):
@@ -90,23 +98,46 @@ class TabelaEventosTela(tk.Frame):
                                      bg=self.form_bg, fg="#333333")
         self.titulo_tabela.pack(pady=(0, 10))
 
-        colunas = ("Nome", "Horário", "Local", "Preço")
+        colunas = ("Selecionar", "Nome", "Horário", "Local", "Preço")
         self.tree = ttk.Treeview(self.frame, columns=colunas, show="headings")
 
-        for coluna in colunas:
+        self.tree.heading("Selecionar", text="Selecionar")
+        self.tree.column("Selecionar", width=90, anchor="center")
+        for coluna in colunas[1:]:
             self.tree.heading(coluna, text=coluna)
             self.tree.column(coluna, width=150)
 
         self.tree.pack(expand=True, fill="both")
 
+        # Adiciona evento de clique duplo para selecionar/deselecionar
+        self.tree.bind("<Double-1>", self._on_treeview_double_click)
+
     def _atualizar_tabela(self):
-        # Limpa a tabela existente
         for item in self.tree.get_children():
             self.tree.delete(item)
 
-        # Insere os eventos filtrados
-        for evento in self.eventos_filtrados:
-            self.tree.insert("", tk.END, values=(evento.nome, evento.horario, evento.local, f"R$ {evento.preco:.2f}"))
+        for idx, evento in enumerate(self.eventos_filtrados):
+            selecionado = "✔" if idx in self.eventos_escolhidos else ""
+            self.tree.insert("", tk.END, iid=idx, values=(selecionado, evento.nome, evento.horario, evento.local, f"R$ {evento.preco:.2f}"))
+
+    def _on_treeview_double_click(self, event):
+        item_id = self.tree.identify_row(event.y)
+        if not item_id:
+            return
+        idx = int(item_id)
+        if idx in self.eventos_escolhidos:
+            self.eventos_escolhidos.remove(idx)
+        else:
+            self.eventos_escolhidos.add(idx)
+        self._atualizar_tabela()
+
+    def mostrar_eventos_escolhidos(self):
+        if not self.eventos_escolhidos:
+            messagebox.showinfo("Meus Eventos", "Nenhum evento selecionado.")
+            return
+        eventos = [self.eventos_filtrados[idx] for idx in self.eventos_escolhidos if idx < len(self.eventos_filtrados)]
+        texto = "\n".join([f"{e.nome} - {e.horario} - {e.local} - R$ {e.preco:.2f}" for e in eventos])
+        messagebox.showinfo("Meus Eventos", texto)
 
     def _aplicar_filtro(self):
         nome_digitado = self.nome_filtro.get().lower()
