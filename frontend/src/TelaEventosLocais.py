@@ -80,16 +80,20 @@ class TabelaEventosTela(tk.Frame):
         self.nome_filtro = tk.StringVar()
         tk.Entry(filtro_frame, textvariable=self.nome_filtro, font=('Arial', 10), width=20).grid(row=0, column=1, padx=5, pady=5)
 
-        tk.Label(filtro_frame, text="Local:", font=('Arial', 10), bg=self.form_bg).grid(row=0, column=2, padx=5, pady=5, sticky="w")
-        self.local_filtro = tk.StringVar()
-        tk.Entry(filtro_frame, textvariable=self.local_filtro, font=('Arial', 10), width=20).grid(row=0, column=3, padx=5, pady=5)
+        tk.Label(filtro_frame, text="Horário:", font=('Arial', 10), bg=self.form_bg).grid(row=0, column=2, padx=5, pady=5, sticky="w")
+        self.horario_filtro = tk.StringVar()
+        tk.Entry(filtro_frame, textvariable=self.horario_filtro, font=('Arial', 10), width=20).grid(row=0, column=3, padx=5, pady=5)
 
-        tk.Label(filtro_frame, text="Preço Máximo:", font=('Arial', 10), bg=self.form_bg).grid(row=0, column=4, padx=5, pady=5, sticky="w")
+        tk.Label(filtro_frame, text="Local:", font=('Arial', 10), bg=self.form_bg).grid(row=0, column=4, padx=5, pady=5, sticky="w")
+        self.local_filtro = tk.StringVar()
+        tk.Entry(filtro_frame, textvariable=self.local_filtro, font=('Arial', 10), width=20).grid(row=0, column=5, padx=5, pady=5)
+
+        tk.Label(filtro_frame, text="Preço Máximo:", font=('Arial', 10), bg=self.form_bg).grid(row=0, column=6, padx=5, pady=5, sticky="w")
         self.preco_filtro = tk.StringVar()
-        tk.Entry(filtro_frame, textvariable=self.preco_filtro, font=('Arial', 10), width=10).grid(row=0, column=5, padx=5, pady=5)
+        tk.Entry(filtro_frame, textvariable=self.preco_filtro, font=('Arial', 10), width=10).grid(row=0, column=7, padx=5, pady=5)
 
         tk.Button(filtro_frame, text="Filtrar", font=('Arial', 10, 'bold'), bg="#2196F3", fg="white",
-                  command=self._aplicar_filtro).grid(row=0, column=6, padx=10, pady=5)
+                  command=self._aplicar_filtro).grid(row=0, column=8, padx=10, pady=5)
 
         tk.Button(filtro_frame, text="Limpar Filtro", font=('Arial', 10), command=self._limpar_filtro).grid(row=1, column=0, columnspan=7, pady=5)
 
@@ -117,7 +121,8 @@ class TabelaEventosTela(tk.Frame):
             self.tree.delete(item)
 
         for idx, evento in enumerate(self.eventos_filtrados):
-            selecionado = "✔" if idx in self.eventos_escolhidos else ""
+            evento_id = (evento.nome, evento.horario, evento.local, evento.preco)
+            selecionado = "✔" if evento_id in self.eventos_escolhidos else ""
             self.tree.insert("", tk.END, iid=idx, values=(selecionado, evento.nome, evento.horario, evento.local, f"R$ {evento.preco:.2f}"))
 
     def _on_treeview_double_click(self, event):
@@ -125,22 +130,31 @@ class TabelaEventosTela(tk.Frame):
         if not item_id:
             return
         idx = int(item_id)
-        if idx in self.eventos_escolhidos:
-            self.eventos_escolhidos.remove(idx)
+        if idx >= len(self.eventos_filtrados):
+            return
+        evento = self.eventos_filtrados[idx]
+        evento_id = (evento.nome, evento.horario, evento.local, evento.preco)
+        if evento_id in self.eventos_escolhidos:
+            self.eventos_escolhidos.remove(evento_id)
         else:
-            self.eventos_escolhidos.add(idx)
+            self.eventos_escolhidos.add(evento_id)
         self._atualizar_tabela()
 
     def mostrar_eventos_escolhidos(self):
         if not self.eventos_escolhidos:
             messagebox.showinfo("Meus Eventos", "Nenhum evento selecionado.")
             return
-        eventos = [self.eventos_filtrados[idx] for idx in self.eventos_escolhidos if idx < len(self.eventos_filtrados)]
+        eventos = []
+        for evento in self.eventos_originais:
+            evento_id = (evento.nome, evento.horario, evento.local, evento.preco)
+            if evento_id in self.eventos_escolhidos:
+                eventos.append(evento)
         texto = "\n".join([f"{e.nome} - {e.horario} - {e.local} - R$ {e.preco:.2f}" for e in eventos])
         messagebox.showinfo("Meus Eventos", texto)
 
     def _aplicar_filtro(self):
         nome_digitado = self.nome_filtro.get().lower()
+        horario_digitado = self.horario_filtro.get()
         local_digitado = self.local_filtro.get().lower()
         preco_max_str = self.preco_filtro.get()
         preco_max = float('inf')
@@ -154,16 +168,18 @@ class TabelaEventosTela(tk.Frame):
         self.eventos_filtrados = []
         for evento in self.eventos_originais:
             nome_match = nome_digitado in evento.nome.lower()
+            horario_match = horario_digitado in evento.horario
             local_match = local_digitado in evento.local.lower()
             preco_match = evento.preco <= preco_max
 
-            if nome_match and local_match and preco_match:
+            if nome_match and horario_match and local_match and preco_match:
                 self.eventos_filtrados.append(evento)
 
         self._atualizar_tabela()
 
     def _limpar_filtro(self):
         self.nome_filtro.set("")
+        self.horario_filtro.set("")
         self.local_filtro.set("")
         self.preco_filtro.set("")
         self.eventos_filtrados = list(self.eventos_originais)
