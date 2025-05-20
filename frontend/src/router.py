@@ -1,6 +1,7 @@
 import tkinter as tk
 from TelaInicial import HomePage  
 from TelaMapa import MapPage
+from TelaEventosLocais import TabelaEventosTela
 
 class AppRouter(tk.Tk):
     def __init__(self):
@@ -16,7 +17,7 @@ class AppRouter(tk.Tk):
 
         self.frames = {}
 
-        for F in (HomePage, MapPage):  # Adicione novas páginas aqui
+        for F in (HomePage, MapPage, TabelaEventosTela):  # Adicione novas páginas aqui
             page_name = F.__name__
             frame = F(parent=container, controller=self)
             self.frames[page_name] = frame
