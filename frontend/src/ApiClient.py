@@ -43,3 +43,16 @@ class ApiClient:
             return {"error": f"Erro HTTP: {e.response.status_code}", "details": e.response.text}
       except requests.exceptions.RequestException as e:
              return {"error": "Erro de conexão", "details": str(e)}
+
+    def getEventos(self):
+        url = f"{self.base_url}/eventos"
+        try:
+            response = requests.get(url)
+            response.raise_for_status()  # <<< Faltavam os parênteses aqui
+            return response.json()  # <<< Retorne os dados corretamente
+        except requests.exceptions.HTTPError as e:
+            print(f"Erro HTTP: {e.response.status_code} - {e.response.text}")
+        except requests.exceptions.RequestException as e:
+            print(f"Erro de conexão: {e}")
+        
+        return [] 
