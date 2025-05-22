@@ -6,9 +6,9 @@ class UsuarioService(Usuario):
     def __init__(self):
         pass
     
-    def buscarUsuario(self, base: Base_Dados):
+    def buscarUsuario(self, nome,base: Base_Dados):
         try:
-            nome_usuario = base.get_nome_usuario()
+            nome_usuario = base.get_nome_usuario(nome)
             if nome_usuario:
                 return Usuario(nome_usuario)
             else:

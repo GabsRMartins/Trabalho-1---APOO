@@ -12,10 +12,20 @@ class Evento:
         self.local = local
         self.preco = preco
 
-class TabelaEventosTela(tk.Frame):
+class EventPage(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent)
-        self.eventos_originais = []
+        self.eventos_originais =  [
+        Evento("Show de Rock Indie", "20:00", "Mineirão", 85.00),
+        Evento("Palestra sobre IA Avançada", "14:30", "UFMG - Auditório Principal", 0.00),
+        Evento("Feira de Artesanato Local", "09:00", "Praça da Liberdade", 15.00),
+        Evento("Cinema ao Ar Livre com Pipoca", "19:00", "Parque das Mangabeiras", 30.00),
+        Evento("Noite de Jazz", "21:00", "Café Central", 40.00),
+        Evento("Workshop de Robótica", "10:00", "SENAI", 50.00),
+        Evento("Cinema ao Ar Livre com Pipoca", "19:00", "Parque das Mangabeiras", 30.00),
+        Evento("Noite de Jazz", "21:00", "Café Central", 40.00),
+        Evento("Workshop de Robótica", "10:00", "SENAI", 50.00)
+    ]
         self.eventos_filtrados = list(self.eventos_originais)
         self.api_client = ApiClient()
         self.form_bg = "#F9F9F9"
@@ -109,7 +119,7 @@ class TabelaEventosTela(tk.Frame):
         self.tree.column("Selecionar", width=90, anchor="center")
         for coluna in colunas[1:]:
             self.tree.heading(coluna, text=coluna)
-            self.tree.column(coluna, width=150)
+            self.tree.column(coluna, width=150, anchor="center")
 
         self.tree.pack(expand=True, fill="both")
 

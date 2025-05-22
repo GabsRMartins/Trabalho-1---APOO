@@ -33,3 +33,13 @@ class ApiClient:
             return {"error": f"Erro HTTP: {e.response.status_code}", "details": e.response.text}
         except requests.exceptions.RequestException as e:
             return {"error": "Erro de conexão", "details": str(e)}
+        
+    def getUserName(self,nome):
+      url = f"{self.base_url}/usuario/usuarioLogado"
+      try:
+          response = requests.get(url)
+          response.raise_for_status
+      except requests.exceptions.HTTPError as e:
+            return {"error": f"Erro HTTP: {e.response.status_code}", "details": e.response.text}
+      except requests.exceptions.RequestException as e:
+             return {"error": "Erro de conexão", "details": str(e)}

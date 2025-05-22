@@ -6,6 +6,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'
 
 from base_de_dados.base_dados import Base_Dados
 from service.LoginService import LoginService
+from service.UsuarioService import UsuarioService
 
 app = Flask(__name__)
 
@@ -67,6 +68,12 @@ def cadastrar():
         return jsonify({'error': 'Erro ao realizar cadastro'}), 401
 
 
+@app.route('/usuario/usuarioLogado', methods=['GET'])
+def usuarioLogado():
+    db = Base_Dados()
+    db.connect()
+    usuario_service = UsuarioService()
+    nome = usuario_service.buscarUsuario(db)
 
 
 

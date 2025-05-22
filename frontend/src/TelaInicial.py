@@ -114,7 +114,7 @@ class HomePage(tk.Frame):
         else:
             token = resultado.get("token", "Token não fornecido")
             messagebox.showinfo("Sucesso", f"Login realizado com sucesso!\nToken: {token}")
-            self.controller.show_frame("MapPage")  
+            self.controller.show_frame("EventPage")  
 
 
     def fazer_cadastro(self):
