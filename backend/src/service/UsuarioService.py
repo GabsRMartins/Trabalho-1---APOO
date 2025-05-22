@@ -6,7 +6,7 @@ class UsuarioService(Usuario):
     def __init__(self):
         pass
     
-    def buscarUsuario(self, nome,base: Base_Dados):
+    def buscarUsuario(self, nome,base: Base_Dados) -> Usuario:
         try:
             nome_usuario = base.get_nome_usuario(nome)
             if nome_usuario:
@@ -17,10 +17,10 @@ class UsuarioService(Usuario):
             print(f"Erro ao buscar usuário: {e}")
             return None
 
-    def getNome(self):
+    def getNome(self) -> str:
         return super()._getNome()
     
-    def getSenha(self):
+    def getSenha(self) -> str:
         return super()._getSenha()
     
     def mudarSenhaUsuario(self, senha):
