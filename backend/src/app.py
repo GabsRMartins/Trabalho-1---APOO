@@ -7,6 +7,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'
 from base_de_dados.base_dados import Base_Dados
 from service.LoginService import LoginService
 from service.UsuarioService import UsuarioService
+from service.EventoService import EventoService
 
 app = Flask(__name__)
 
@@ -16,15 +17,8 @@ app = Flask(__name__)
 def home():
     return "API rodando!"
 
-@app.route('/eventos',methods=['GET'])
-def obter_eventos():
-    return jsonify(eventos)
 
-@app.route('/eventos/<int:id>',methods=['GET'])
-def obter_eventos_por_id(id):
-    return eventos.id == id
 
-from flask import request, jsonify
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -74,6 +68,13 @@ def usuarioLogado():
     db.connect()
     usuario_service = UsuarioService()
     nome = usuario_service.buscarUsuario(db)
+
+@app.route('/eventos',methods=['GET'])
+def pegarEventos():
+    db = Base_Dados()
+    db.connect()
+    evento_service = EventoService()
+    return evento_service.obterEventos(db)                                            
 
 
 

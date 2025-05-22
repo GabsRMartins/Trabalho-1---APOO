@@ -1,14 +1,15 @@
-import Entidade
-import Local
+from entity.Entidade import Entidade
+from entity.Local import Local
+
 
 class Evento(Entidade):
     
-    def __init__(self, nome: str,horario: str,local: Local,preco: float,fotos: list):
+    def __init__(self, nome: str,horario: str,local: Local,preco: float):#fotos: list):
         self.nome = nome
         self.horario = horario
         self.local = local
         self.preco = preco
-        self.fotos = fotos
+        #self.fotos = fotos
 
     def _getHorario(self):
         return self.horario
@@ -33,4 +34,7 @@ class Evento(Entidade):
     
     def _setFotos(self,fotos):
         self.fotos = fotos
+
+    def print(self):
+        print(self.nome)    
 
