@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS eventos (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nome_evento TEXT NOT NULL,
     local_evento TEXT NOT NULL,
-    horario DATE NOT NULL, 
+    horario TEXT NOT NULL, 
     organizadora TEXT NOT NULL,
     preco INTEGER,
     id_usuario INTEGER NOT NULL,

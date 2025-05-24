@@ -6,8 +6,9 @@ class tipoUsuario(Enum):
     PROMOTOR = 2
 
 class Usuario:
-    def __init__(self, nome:str, senha:str, tipo:tipoUsuario):
+    def __init__(self, nome:str, senha:str, email:str ,tipo:tipoUsuario):
         self.nome = nome
+        self.email = email
         self.__senha = senha
         self.__tipo = self._converterTipo(tipo)
 

@@ -58,6 +58,15 @@ class Base_Dados:
             print(f"Erro ao buscar usuário por nome: {e}")
             return []
         
+    def get_usuario_id(self, id):
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("SELECT * FROM usuario WHERE nome = ?", (id,))
+            return cursor.fetchall()
+        except sqlite3.Error as e:
+            print(f"Erro ao buscar usuário por id: {e}")
+            return []    
+        
     def get_senha(self, senha):
         try:
             cursor = self.connection.cursor()
