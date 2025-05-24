@@ -1,6 +1,6 @@
-from entity import Promotor
-from entity import Mapa
-from service import EventoService
+from ..entity.Promotor import Promotor
+from ..entity.Mapa import Mapa
+from ..service.EventoService import EventoService
 
 class PromotorService(Promotor):
 

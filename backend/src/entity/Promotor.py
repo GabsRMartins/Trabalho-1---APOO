@@ -1,11 +1,11 @@
-import Usuario
-import Mapa
-from service import EventoService
-from service import MapaService
+from .Usuario import Usuario
+from .Mapa import Mapa
+from ..service.EventoService import EventoService
+from ..service.MapaService import MapaService
 
 class Promotor(Usuario):
 
-    def __init__(self,nome: str, senha: str):
+    def __init__(self, nome: str, senha: str):
         super.__init__(nome,senha)
         self.eventos = []
 
@@ -15,3 +15,5 @@ class Promotor(Usuario):
 
     def _removerEvento(self, evento):            
         evento.removerEvento()
+
+        

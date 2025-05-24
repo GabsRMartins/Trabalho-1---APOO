@@ -1,26 +1,26 @@
-import Usuario
-from service.MapaService import MapaService
+from .Usuario import Usuario
+from .Evento import Evento
+from ..service.MapaService import MapaService
 
 class Ativo(Usuario):
 
-    def __init__(self,nome,senha):
-        super.__init__(nome,senha)
+    def __init__(self, nome: str, senha: str):
+        super().__init__(nome, senha, tipo=1)
 
         self.listaEventos = []
 
     def _acessarMapa(self, mapa: MapaService):
-        return mapa.retornaMapa()
+        return mapa._retornarMapa()
 
-    def _selecionaEventos(self, evento):
+    def _selecionaEventos(self, evento: Evento):
 
-        # evento = buscarEvento(evento)
-        self.listaEventos.append(evento)        
+        if evento not in self.listaEventos:
+            self.listaEventos.append(evento)      
 
     def _retornaEventos(self):
         return self.listaEventos
     
-    def _removerEventos(self, evento):
+    def _removerEventos(self, evento: Evento):
         self.listaEventos.remove(evento)
-
 
 

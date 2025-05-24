@@ -3,6 +3,6 @@ from abc import ABC,abstractmethod
 class Entidade(ABC):
     
     @abstractmethod
-    def print(self):
+    def _getNome(self):
         pass
 

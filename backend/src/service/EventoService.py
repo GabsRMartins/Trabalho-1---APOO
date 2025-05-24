@@ -1,9 +1,9 @@
-from entity.Evento import Evento
-from base_de_dados.base_dados import Base_Dados
+from ..entity.Evento import Evento
+from ....base_de_dados.base_dados import Base_Dados
 
 class EventoService(Evento):
 
-    def __init__(self, horario, local, preco, fotos):
+    def __init__(self):
         pass
 
     def buscarEvento(self, base: Base_Dados):
@@ -12,10 +12,13 @@ class EventoService(Evento):
             if nome_evento:
                 return Evento(nome_evento)
             else:
-                return None  # Nenhum usuário encontrado
+                return None  # Nenhum evento encontrado
         except Exception as e:
-            print(f"Erro ao buscar usuário: {e}")
+            print(f"Erro ao buscar evento: {e}")
             return None
+
+    def getNome(self):
+        return super()._getNome()
 
     def getHorario(self):
         return super()._getHorario()
@@ -29,6 +32,9 @@ class EventoService(Evento):
     def getFotos(self):
         return super()._getFotos()
     
+    def setNome(self, nome: str):
+        super()._setNome(nome)
+
     def setHorario(self, horario):
         super()._setHorario(horario)
 
