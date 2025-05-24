@@ -15,27 +15,25 @@ class Evento:
 class EventPage(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent)
-        self.eventos_originais =  [
-        Evento("Show de Rock Indie", "20:00", "Mineirão", 85.00),
-        Evento("Palestra sobre IA Avançada", "14:30", "UFMG - Auditório Principal", 0.00),
-        Evento("Feira de Artesanato Local", "09:00", "Praça da Liberdade", 15.00),
-        Evento("Cinema ao Ar Livre com Pipoca", "19:00", "Parque das Mangabeiras", 30.00),
-        Evento("Noite de Jazz", "21:00", "Café Central", 40.00),
-        Evento("Workshop de Robótica", "10:00", "SENAI", 50.00),
-        Evento("Cinema ao Ar Livre com Pipoca", "19:00", "Parque das Mangabeiras", 30.00),
-        Evento("Noite de Jazz", "21:00", "Café Central", 40.00),
-        Evento("Workshop de Robótica", "10:00", "SENAI", 50.00)
-    ]
-        self.eventos_filtrados = list(self.eventos_originais)
-        self.api_client = ApiClient()
         self.form_bg = "#F9F9F9"
         self.controller = controller
+        self.api_client = controller.api_client
+        self.usuarioLogado = None 
+        self.carregado = False
+        self.eventos_originais = self.api_client.getEventos()
+        self.eventos_filtrados = list(self.eventos_originais)  
         self.eventos_escolhidos = set()  # Armazena índices dos eventos escolhidos
 
         try:
             self.original_image = Image.open("../assets/background_events.png")
         except FileNotFoundError:
             self.original_image = Image.new("RGB", (1, 1), "white")
+
+        try:
+           
+            print(type(self.usuarioLogado))
+        except NameError:
+            print("Deu ruim")        
 
         self.bg_photo = ImageTk.PhotoImage(self.original_image)
         self.bg_label = tk.Label(self, image=self.bg_photo)
@@ -48,14 +46,10 @@ class EventPage(tk.Frame):
         self.header_frame = tk.Frame(self.frame, bg=self.form_bg)
         self.header_frame.pack(fill="x", pady=(0,10))
 
-        self.bem_vindo_label = tk.Label(
-            self.header_frame,
-            text=f"Bem vindo(a), Usuário!",
-            font=('Arial', 12, 'bold'),
-            bg="#F9F9F9",
-            anchor="w"
-        )
-        self.bem_vindo_label.pack(side="left", padx=15, pady=10)
+     
+       
+
+       
 
         self.logout_button = tk.Button(
             self.header_frame,
@@ -81,6 +75,19 @@ class EventPage(tk.Frame):
         self._criar_interface_filtro()
         self._criar_tabela()
         self._atualizar_tabela()
+
+    def on_show(self):
+     self.usuarioLogado = self.api_client.getDadosLogado()
+     self.bem_vindo_label = tk.Label(
+        self.header_frame,
+            text=f"Bem vindo(a), {self.usuarioLogado.nome}",
+            font=('Arial', 12, 'bold'),
+            bg="#F9F9F9",
+            anchor="w"
+        )
+     self.bem_vindo_label.pack(side="left", padx=15, pady=10)
+
+
 
     def _criar_interface_filtro(self):
         filtro_frame = tk.LabelFrame(self.frame, text="Filtrar Eventos", font=('Arial', 12), bg=self.form_bg, fg="#333333")
@@ -216,26 +223,3 @@ class EventPage(tk.Frame):
     # def logout(self):
     #     # Definir o comportamento do logout (ir para a tela de login e cadastro)
     #     self.parent.destroy()
-
-if __name__ == "__main__":
-    root = tk.Tk()
-    root.title("Tabela de Eventos com Filtro")
-    eventos_exemplo = [
-        Evento("Show de Rock Indie", "20:00", "Mineirão", 85.00),
-        Evento("Palestra sobre IA Avançada", "14:30", "UFMG - Auditório Principal", 0.00),
-        Evento("Feira de Artesanato Local", "09:00", "Praça da Liberdade", 15.00),
-        Evento("Cinema ao Ar Livre com Pipoca", "19:00", "Parque das Mangabeiras", 30.00),
-        Evento("Noite de Jazz", "21:00", "Café Central", 40.00),
-        Evento("Workshop de Robótica", "10:00", "SENAI", 50.00)
-    ]
-
-    controller = None
-
-    app = TabelaEventosTela(root, controller)
-
-    for evento in eventos_exemplo:
-
-        app.inserir_evento(evento)
-
-    app.pack(fill="both", expand=True)
-    root.mainloop()

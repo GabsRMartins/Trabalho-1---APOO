@@ -1,9 +1,10 @@
 from entity.Evento import Evento
 from base_de_dados.base_dados import Base_Dados
+from typing import List
 
 class EventoService(Evento):
 
-    def __init__(self, horario, local, preco, fotos):
+    def __init__(self):
         pass
 
     def buscarEvento(self, base: Base_Dados):
@@ -12,10 +13,22 @@ class EventoService(Evento):
             if nome_evento:
                 return Evento(nome_evento)
             else:
-                return None  # Nenhum usuário encontrado
+                return None  # Nenhum evento encontrado
         except Exception as e:
-            print(f"Erro ao buscar usuário: {e}")
+            print(f"Erro ao buscar evento: {e}")
             return None
+        
+
+    def obterEventos(self, base: Base_Dados) -> List[Evento]:
+     try:
+        lista_eventos_tuplas = base.get_eventos()
+        eventos = [
+            Evento(*tupla) for tupla in lista_eventos_tuplas
+        ]
+        return eventos
+     except Exception as e:
+        print(f"Erro ao obter lista de eventos: {e}")
+        return [] 
 
     def getHorario(self):
         return super()._getHorario()
