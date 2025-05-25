@@ -102,4 +102,4 @@ if __name__ == '__main__':
     db.connect()
     db.execute_script()  # Executa role_dia_db.sql
     db.close()
-    app.run(port=5000, host='localhost', debug=True)
+    app.run(port=8000, host='localhost', debug=True)

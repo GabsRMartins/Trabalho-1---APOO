@@ -5,7 +5,6 @@ class Base_Dados:
     def __init__(self)-> None:
         self.db_name = os.path.join(os.path.dirname(__file__), 'role_dia_db.db')
         self.connection = None
-        self.cursor = None
 
     def connect(self) -> None:
         try:
@@ -18,13 +17,14 @@ class Base_Dados:
             script_path = os.path.join(os.path.dirname(__file__), 'role_dia_db.sql')
             with open(script_path, 'r', encoding='utf-8') as file:
                 script = file.read()
-            self.cursor = self.connection.cursor()
-            self.cursor.executescript(script)
+            cursor = self.connection.cursor()
+            cursor.executescript(script)
             self.connection.commit()
         except sqlite3.Error as e:
             print(f"Erro ao executar o script SQL: {e}")
 
     def add_usuario(self, nome, email, senha, tipo_usuario)-> str:
+        cursor =  self.connection.cursor()
         try:
             cursor.execute("""
                 INSERT INTO usuario (nome, email, senha, tipo_usuario) 
@@ -35,6 +35,7 @@ class Base_Dados:
             print(f"Erro ao adicionar usuário: {e}")
 
     def add_evento(self, nome_evento:str, local_evento:str, organizadora:str, id_usuario:str)-> str:
+        cursor =  self.connection.cursor()
         try:
             cursor.execute("""
             INSERT INTO eventos (nome_evento, local_evento, organizadora, id_usuario) 
@@ -45,15 +46,25 @@ class Base_Dados:
             print(f"Erro ao adicionar evento: {e}")
 
     def get_usuario(self, nome):
+        cursor =  self.connection.cursor()
         try:
-            cursor = self.connection.cursor()
             cursor.execute("SELECT * FROM usuario WHERE nome = ?", (nome,))
             return cursor.fetchall()
         except sqlite3.Error as e:
             print(f"Erro ao buscar usuário por nome: {e}")
             return []
-        
+
+    def get_usuario_id(self, id):
+        cursor = self.connection.cursor()
+        try:
+            cursor.execute("SELECT * FROM usuario WHERE nome = ?", (id,))
+            return cursor.fetchall()
+        except sqlite3.Error as e:
+            print(f"Erro ao buscar usuário por id: {e}")
+            return []
+
     def get_senha(self, senha)->str:
+        cursor =  self.connection.cursor()
         try:
             cursor.execute("SELECT * FROM usuario WHERE senha = ?", (senha,))
             return cursor.fetchall()
@@ -62,6 +73,7 @@ class Base_Dados:
             return []
             
     def cadastrar(self, username, email, password,  tipo)-> None:
+        cursor =  self.connection.cursor()
         try:
             cursor.execute("""
             INSERT INTO usuario (nome, email, senha, tipo_usuario)
@@ -71,14 +83,14 @@ class Base_Dados:
         except sqlite3.Error as e:
             print(f"Erro ao cadastrar usuário: {e}")
 
-    def __del__(self)-> None:
+    def close(self)-> None:
         if self.connection:
             self.connection.close()
             print("Conexão com o banco encerrada.")
 
     def get_eventos(self):
+        cursor =  self.connection.cursor()
         try:
-            cursor = self.connection.cursor()
             cursor.execute("SELECT * FROM eventos ")
             return cursor.fetchall()
         except sqlite3.Error as e:
