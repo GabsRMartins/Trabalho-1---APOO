@@ -1,10 +1,12 @@
 import tkinter as tk
 from TelaInicial import HomePage  
 from TelaMapa import MapPage
-
+from TelaEventosLocais import EventPage
+from ApiClient import ApiClient
 class AppRouter(tk.Tk):
     def __init__(self):
         super().__init__()
+        self.api_client = ApiClient()
         self.title("Role do Dia")
         self.state("zoomed")  # Maximiza a janela
         self.attributes("-alpha", 0.97)
@@ -16,7 +18,7 @@ class AppRouter(tk.Tk):
 
         self.frames = {}
 
-        for F in (HomePage, MapPage):  # Adicione novas páginas aqui
+        for F in (HomePage, MapPage, EventPage):  # Adicione novas páginas aqui
             page_name = F.__name__
             frame = F(parent=container, controller=self)
             self.frames[page_name] = frame
@@ -26,6 +28,8 @@ class AppRouter(tk.Tk):
        
 
     def show_frame(self, page_name):
-        frame = self.frames[page_name]
-        frame.tkraise()
+     frame = self.frames[page_name]
+     frame.tkraise()
+     if hasattr(frame, 'on_show'):
+        frame.on_show()
 

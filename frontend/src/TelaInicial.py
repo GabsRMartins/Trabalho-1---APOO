@@ -10,7 +10,7 @@ class HomePage(tk.Frame):
         super().__init__(parent)
         self.controller = controller
         self.nome_shown = False
-        self.api_client = ApiClient()
+        self.api_client = controller.api_client
 
         self.form_bg = "#F9F9F9"
         self.original_image = Image.open("../assets/communityIcon_5x80ha0cfj7d1.png")
@@ -102,19 +102,22 @@ class HomePage(tk.Frame):
 
 
     def fazer_login(self):
-        if self.nome_shown:
-            self.mostrar_formulario_login()
-
-        usuario = self.entry_usuario.get()
-        senha = self.entry_senha.get()
-        resultado = self.api_client.login(usuario, senha)
-
-        if "error" in resultado:
-            messagebox.showerror("Erro", f"{resultado['error']}\n{resultado.get('details', '')}")
+     if self.nome_shown:
+        self.mostrar_formulario_login()
+     usuario = self.entry_usuario.get()
+     senha = self.entry_senha.get()
+     resultado = self.api_client.login(usuario, senha)
+     if "error" in resultado:
+        messagebox.showerror("Erro", f"{resultado['error']}\n{resultado.get('details', '')}")
+     else:
+        token = resultado.get("access_token")
+        if token:
+            messagebox.showinfo("Sucesso", f"Login realizado com sucesso!")
+            self.api_client.token = token
+            self.controller.show_frame("EventPage")
         else:
-            token = resultado.get("token", "Token não fornecido")
-            messagebox.showinfo("Sucesso", f"Login realizado com sucesso!\nToken: {token}")
-            self.controller.show_frame("MapPage")  
+            messagebox.showerror("Erro", "Token de acesso não encontrado na resposta.")
+
 
 
     def fazer_cadastro(self):

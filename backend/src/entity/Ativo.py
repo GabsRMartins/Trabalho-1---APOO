@@ -1,6 +1,8 @@
 import Usuario
 from service.MapaService import MapaService
-
+from entity import Mapa
+from entity import Evento
+from typing import List
 class Ativo(Usuario):
 
     def __init__(self,nome,senha):
@@ -8,7 +10,7 @@ class Ativo(Usuario):
 
         self.listaEventos = []
 
-    def _acessarMapa(self, mapa: MapaService):
+    def _acessarMapa(self, mapa: MapaService)-> Mapa:
         return mapa.retornaMapa()
 
     def _selecionaEventos(self, evento):
@@ -16,7 +18,7 @@ class Ativo(Usuario):
         # evento = buscarEvento(evento)
         self.listaEventos.append(evento)        
 
-    def _retornaEventos(self):
+    def _retornaEventos(self) -> List[Evento]:
         return self.listaEventos
     
     def _removerEventos(self, evento):

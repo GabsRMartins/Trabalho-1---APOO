@@ -58,7 +58,7 @@ class Base_Dados:
             cursor.execute("SELECT * FROM usuario WHERE senha = ?", (senha,))
             return cursor.fetchall()
         except sqlite3.Error as e:
-            print(f"Erro ao buscar usuário por nome: {e}")
+            print(f"Erro ao obter credenciais: {e}")
             return []
             
     def cadastrar(self, username, email, password,  tipo)-> None:
@@ -74,3 +74,13 @@ class Base_Dados:
     def __del__(self)-> None:
         if self.connection:
             self.connection.close()
+            print("Conexão com o banco encerrada.")
+
+    def get_eventos(self):
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("SELECT * FROM eventos ")
+            return cursor.fetchall()
+        except sqlite3.Error as e:
+            print(f"Erro ao consultar eventos: {e}")
+            return []
