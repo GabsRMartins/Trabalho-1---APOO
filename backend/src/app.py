@@ -1,4 +1,6 @@
 from flask import Flask, jsonify, request
+from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity, create_access_token
+
 
 import sys
 import os
@@ -6,28 +8,24 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'
 
 from base_de_dados.base_dados import Base_Dados
 from service.LoginService import LoginService
+from service.UsuarioService import UsuarioService
+from service.EventoService import EventoService
 
 app = Flask(__name__)
-
+app.config["JWT_SECRET_KEY"] = "ACSACASSA"
+jwt = JWTManager(app)
 
 
 @app.route('/')
 def home():
     return "API rodando!"
 
-@app.route('/eventos',methods=['GET'])
-def obter_eventos():
-    return jsonify(eventos)
 
-@app.route('/eventos/<int:id>',methods=['GET'])
-def obter_eventos_por_id(id):
-    return eventos.id == id
 
-from flask import request, jsonify
 
 @app.route('/login', methods=['POST'])
 def login():
-    data = request.get_json()  
+    data = request.get_json()
     username = data.get('username')
     password = data.get('password')
 
@@ -42,7 +40,8 @@ def login():
     db.close()
 
     if autenticado:
-        return jsonify({'message': 'Login efetuado com sucesso'}), 200
+        access_token = create_access_token(identity=username)
+        return jsonify({'access_token': access_token}), 200
     else:
         return jsonify({'error': 'Usuário ou senha inválidos'}), 401
 
@@ -67,6 +66,34 @@ def cadastrar():
         return jsonify({'error': 'Erro ao realizar cadastro'}), 401
 
 
+@app.route('/usuario/usuarioLogado', methods=['GET'])
+@jwt_required()
+def usuario_logado():
+    db = Base_Dados()
+    db.connect()
+    usuario_id = get_jwt_identity()
+    usuario_service = UsuarioService()
+    usuario = usuario_service.buscarUsuarioId(usuario_id,db)
+    if usuario:
+        return jsonify({
+            "nome": usuario.nome,
+            "email": usuario.email,
+        })
+    else:
+        return jsonify({"error": "Usuário não encontrado"}), 404
+
+
+
+
+
+@app.route('/eventos',methods=['GET'])
+def pegarEventos():
+    db = Base_Dados()
+    db.connect()
+    evento_service = EventoService()
+    eventos = evento_service.obterEventos(db)
+    eventos_dict = [evento.to_dict() for evento in eventos]
+    return jsonify(eventos_dict)                                     
 
 
 
