@@ -11,6 +11,7 @@ class Usuario:
         self.email = email
         self.__senha = senha
         self.__tipo = self._converterTipo(tipo)
+        self.idTipo = tipo
 
     def _converterTipo(self, tipo_codigo: int) -> tipoUsuario:
         if tipo_codigo == 1:
@@ -32,3 +33,6 @@ class Usuario:
 # Depois substituir por um método de cryptografar 
     def _setSenha(self, senha):
         self.__senha = senha   
+
+    def getTipo(self):
+        return self.__tipo    

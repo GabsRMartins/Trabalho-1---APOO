@@ -4,6 +4,7 @@ from PIL import Image, ImageTk
 import requests
 from ApiClient import ApiClient
 from tkinter import ttk
+import customtkinter as ctk
 
 class HomePage(tk.Frame):
     def __init__(self, parent, controller):
@@ -15,58 +16,97 @@ class HomePage(tk.Frame):
         self.form_bg = "#F9F9F9"
         self.original_image = Image.open("../assets/communityIcon_5x80ha0cfj7d1.png")
 
+        # Configuração inicial da imagem de fundo
         self.bg_photo = ImageTk.PhotoImage(self.original_image)
         self.bg_label = tk.Label(self, image=self.bg_photo)
         self.bg_label.place(x=0, y=0, relwidth=1, relheight=1)
+        self.bg_label.lower()  # Garante que o frame fique acima
+
         self.bind("<Configure>", self.atualizar_imagem)
 
-        self.frame = tk.Frame(self, bg=self.form_bg, padx=20, pady=20)
+        # Frame central com tamanho fixo
+        self.frame = ctk.CTkFrame(
+            self,
+            fg_color=self.form_bg,
+            corner_radius=15,
+            width=800,  # Ajuste conforme necessário
+            height=300
+        )
         self.frame.place(relx=0.5, rely=0.5, anchor="center")
 
         self.build_form()
 
+    def atualizar_imagem(self, event):
+        """Redimensiona a imagem de fundo dinamicamente."""
+        resized_image = self.original_image.resize((event.width, event.height), Image.LANCZOS)
+        self.bg_photo = ImageTk.PhotoImage(resized_image)
+        self.bg_label.config(image=self.bg_photo)
+
     def build_form(self):
-        tk.Label(self.frame, text="Bem-vindo!", font=('Arial', 20, 'bold'),
-             bg=self.form_bg, fg="#333333").grid(row=0, column=0, columnspan=2, pady=(0, 20))
+        ctk.CTkLabel(
+            self.frame,
+            text="Bem-vindo!",
+            font=('Arial', 20, 'bold'),
+            text_color="#333333"
+        ).grid(row=0, column=0, columnspan=2, padx=60, pady=(20, 10))
 
-        # Campos que devem aparecer somente no cadastro:
-        self.label_nome = tk.Label(self.frame, text="Nome:", font=('Arial', 12), bg=self.form_bg)
-        self.entry_nome = tk.Entry(self.frame, font=('Arial', 12), width=30, bd=1, relief="solid")
+        # Labels e campos do formulário
+        self.label_nome = ctk.CTkLabel(self.frame, text="Nome:", font=('Arial', 12))
+        self.entry_nome = ctk.CTkEntry(self.frame, font=('Arial', 12), width=250)
 
-        self.label_email = tk.Label(self.frame, text="Email:", font=('Arial', 12), bg=self.form_bg)
-        self.entry_email = tk.Entry(self.frame, font=('Arial', 12), width=30, bd=1, relief="solid")
+        self.label_email = ctk.CTkLabel(self.frame, text="Email:", font=('Arial', 12))
+        self.entry_email = ctk.CTkEntry(self.frame, font=('Arial', 12), width=250)
 
-        self.label_tipo = tk.Label(self.frame, text="Tipo de Usuário:", font=('Arial', 12), bg=self.form_bg)
-        self.tipo_var = tk.StringVar()
-        self.combo_tipo = ttk.Combobox(self.frame, textvariable=self.tipo_var, font=('Arial', 12), width=28, state="readonly")
-        self.combo_tipo['values'] = ("Ativo", "Promotor")
-        self.combo_tipo.current(0)
+        self.label_tipo = ctk.CTkLabel(self.frame, text="Tipo de Usuário:", font=('Arial', 12))
 
-        # Campos comuns ao login:
-        self.label_usuario = tk.Label(self.frame, text="Usuário:", font=('Arial', 12), bg=self.form_bg)
-        self.entry_usuario = tk.Entry(self.frame, font=('Arial', 12), width=30, bd=1, relief="solid")
-        self.label_usuario.grid(row=3, column=0, sticky="w")
-        self.entry_usuario.grid(row=3, column=1, pady=5)
-
-        tk.Label(self.frame, text="Senha:", font=('Arial', 12), bg=self.form_bg).grid(row=4, column=0, sticky="w")
-        self.entry_senha = tk.Entry(self.frame, show="*", font=('Arial', 12), width=30, bd=1, relief="solid")
-        self.entry_senha.grid(row=4, column=1, pady=5)
-
-        btn_login = tk.Button(
-            self.frame, text="Login", font=('Arial', 12, 'bold'),
-            bg="#4CAF50", fg="white", activebackground="#45A049",
-            width=20, command=self.fazer_login
+        self.tipo_var = tk.StringVar(value="Ativo")
+        self.combo_tipo = ctk.CTkComboBox(
+            self.frame,
+            variable=self.tipo_var,
+            values=["Ativo", "Promotor"],
+            font=('Arial', 12),
+            width=250
         )
-        btn_login.grid(row=5, column=0, columnspan=2, pady=(15, 5))
+        self.combo_tipo.set("Ativo")  # valor inicial
 
-        self.btn_cadastro = tk.Button(
-            self.frame, text="Cadastrar", font=('Arial', 12, 'bold'),
-            bg="#2196F3", fg="white", activebackground="#1976D2",
-            width=20, command=self.fazer_cadastro
+        self.label_usuario = ctk.CTkLabel(self.frame, text="Usuário:", font=('Arial', 12))
+        self.entry_usuario = ctk.CTkEntry(self.frame, font=('Arial', 12), width=250)
+
+        self.label_senha = ctk.CTkLabel(self.frame, text="Senha:", font=('Arial', 12))
+        self.entry_senha = ctk.CTkEntry(self.frame, font=('Arial', 12), width=250, show="*")
+
+        self.label_usuario.grid(row=3, column=0, sticky="w", pady=(5, 0))
+        self.entry_usuario.grid(row=4, column=0, pady=(0, 5))
+        self.label_senha.grid(row=5, column=0, sticky="w", pady=(10, 0))
+        self.entry_senha.grid(row=6, column=0, pady=(0, 10))
+
+        btn_login = ctk.CTkButton(
+            master=self.frame,
+            text="Login",
+            font=('Arial', 12, 'bold'),
+            fg_color="#4CAF50",
+            hover_color="#45A049",
+            text_color="white",
+            width=200,
+            height=40,
+            corner_radius=10,
+            command=self.fazer_login
         )
-        self.btn_cadastro.grid(row=6, column=0, columnspan=2)
+        btn_login.grid(row=7, column=0, columnspan=2, pady=(15, 5))
 
-
+        self.btn_cadastro = ctk.CTkButton(
+            master=self.frame,
+            text="Cadastrar",
+            font=('Arial', 12, 'bold'),
+            fg_color="#2196F3",
+            hover_color="#1976D2",
+            text_color="white",
+            width=200,
+            height=40,
+            corner_radius=10,
+            command=self.fazer_cadastro
+        )
+        self.btn_cadastro.grid(row=8, column=0, columnspan=2)
         self.nome_shown = False
 
     def mostrar_formulario_login(self):
@@ -77,50 +117,61 @@ class HomePage(tk.Frame):
         self.label_tipo.grid_forget()
         self.combo_tipo.grid_forget()
 
-        self.label_usuario.grid(row=1, column=0, sticky="w", pady=(10, 0))
-        self.entry_usuario.grid(row=1, column=1, pady=5)
+        self.label_usuario.grid(row=3, column=0, sticky="w", pady=(5, 0))
+        self.entry_usuario.grid(row=4, column=0, pady=(0, 5))
+        self.label_senha.grid(row=5, column=0, sticky="w", pady=(10, 0))
+        self.entry_senha.grid(row=6, column=0, pady=(0, 10))
 
-        self.btn_cadastro.config(text="Cadastrar")
+        self.btn_cadastro.configure(text="Cadastrar")
         self.nome_shown = False
 
 
     def mostrar_formulario_cadastro(self):
-        self.label_nome.grid(row=1, column=0, sticky="w", pady=(10, 0))
+        self.label_nome.grid(row=1, column=0)
         self.entry_nome.grid(row=1, column=1, pady=5)
 
-        self.label_email.grid(row=2, column=0, sticky="w")
+        self.label_email.grid(row=2, column=0)
         self.entry_email.grid(row=2, column=1, pady=(0, 10))
 
         self.label_tipo.grid(row=3, column=0, sticky="w")
         self.combo_tipo.grid(row=3, column=1, pady=5)
 
+        self.label_senha.grid(row=4, column=0, sticky="s")
+        self.entry_senha.grid(row=4, column=1, pady=(10,0))
+
         self.label_usuario.grid_forget()
         self.entry_usuario.grid_forget()
 
-        self.btn_cadastro.config(text="Finalizar Cadastro")
+        self.btn_cadastro.configure(text="Finalizar Cadastro")
         self.nome_shown = True
 
 
     def fazer_login(self):
      if self.nome_shown:
         self.mostrar_formulario_login()
-     usuario = self.entry_usuario.get()
-     senha = self.entry_senha.get()
-     resultado = self.api_client.login(usuario, senha)
-     if "error" in resultado:
-        messagebox.showerror("Erro", f"{resultado['error']}\n{resultado.get('details', '')}")
-     else:
-        token = resultado.get("access_token")
-        if token:
-            messagebox.showinfo("Sucesso", f"Login realizado com sucesso!")
-            self.api_client.token = token
-            self.controller.show_frame("EventPage")
+     else:   
+        usuario = self.entry_usuario.get()
+        senha = self.entry_senha.get()
+        resultado = self.api_client.login(usuario, senha)
+        if "error" in resultado:
+            messagebox.showerror("Erro", f"{resultado['error']}\n{resultado.get('details', '')}")
         else:
-            messagebox.showerror("Erro", "Token de acesso não encontrado na resposta.")
+            token = resultado.get("access_token")
+            if token:
+                messagebox.showinfo("Sucesso", f"Login realizado com sucesso!")
+                self.api_client.token = token
+                dadosUsuario = self.api_client.getDadosLogado()
+                if( dadosUsuario.tipo == 1):
+                 self.controller.show_frame("EventPage")
+                else:
+                 self.controller.show_frame("TelaCadastro")   
+            else:
+                messagebox.showerror("Erro", "Token de acesso não encontrado na resposta.")
 
 
 
     def fazer_cadastro(self):
+        print(self.nome_shown)
         if not self.nome_shown:
             self.mostrar_formulario_cadastro()
         else:

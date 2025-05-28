@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request
-from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity, create_access_token
+from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity, create_access_token, get_jwt
 
 
 import sys
@@ -13,6 +13,9 @@ from service.EventoService import EventoService
 
 app = Flask(__name__)
 app.config["JWT_SECRET_KEY"] = "ACSACASSA"
+app.config["JWT_BLACKLIST_ENABLED"] = True
+app.config["JWT_BLACKLIST_TOKEN_CHECKS"] = ["access"]
+
 jwt = JWTManager(app)
 
 
@@ -66,6 +69,21 @@ def cadastrar():
         return jsonify({'error': 'Erro ao realizar cadastro'}), 401
 
 
+blacklist = set()
+
+@jwt.token_in_blocklist_loader
+def check_if_token_revoked(jwt_header, jwt_payload):
+    jti = jwt_payload["jti"]
+    return jti in blacklist
+
+
+@app.route('/logout', methods=['POST'])
+@jwt_required()
+def logout():
+    jti = get_jwt()["jti"]  # JWT ID único do token
+    blacklist.add(jti)
+    return jsonify({"msg": "Logout realizado com sucesso"}), 200
+
 @app.route('/usuario/usuarioLogado', methods=['GET'])
 @jwt_required()
 def usuario_logado():
@@ -78,6 +96,7 @@ def usuario_logado():
         return jsonify({
             "nome": usuario.nome,
             "email": usuario.email,
+            "tipo":usuario.idTipo
         })
     else:
         return jsonify({"error": "Usuário não encontrado"}), 404
