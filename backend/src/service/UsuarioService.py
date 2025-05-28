@@ -20,7 +20,6 @@ class UsuarioService(Usuario):
     def buscarUsuarioId(self, id,base: Base_Dados) -> Usuario:
         try:
             id_usuario = base.get_usuario_id(id)
-            print(id_usuario)
             if id_usuario:
                 tupla = id_usuario[0]
                 return Usuario(tupla[1], tupla[2], tupla[3], tupla[4])

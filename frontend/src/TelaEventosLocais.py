@@ -3,6 +3,8 @@ from tkinter import ttk, messagebox
 from TelaInicial import HomePage
 from PIL import Image, ImageTk
 from ApiClient import ApiClient
+from Components.logout_button import LogoutButton
+import customtkinter as ctk
 
 
 class Evento:
@@ -28,12 +30,7 @@ class EventPage(tk.Frame):
             self.original_image = Image.open("../assets/background_events.png")
         except FileNotFoundError:
             self.original_image = Image.new("RGB", (1, 1), "white")
-
-        try:
-           
-            print(type(self.usuarioLogado))
-        except NameError:
-            print("Deu ruim")        
+      
 
         self.bg_photo = ImageTk.PhotoImage(self.original_image)
         self.bg_label = tk.Label(self, image=self.bg_photo)
@@ -46,21 +43,8 @@ class EventPage(tk.Frame):
         self.header_frame = tk.Frame(self.frame, bg=self.form_bg)
         self.header_frame.pack(fill="x", pady=(0,10))
 
+        LogoutButton(self.header_frame, self.api_client, self.controller)
      
-       
-
-       
-
-        self.logout_button = tk.Button(
-            self.header_frame,
-            text="Logout",
-            font=('Arial', 10, 'bold'),
-            bg="#E53935",
-            fg="white",
-            command= lambda : controller.show_frame(HomePage(self.parent, controller)) if controller else self.parent.destroy()
-        )
-        self.logout_button.pack(side="right", padx=15, pady=10)
-
         # Botão para ver eventos escolhidos
         self.ver_eventos_button = tk.Button(
             self.header_frame,
@@ -77,17 +61,20 @@ class EventPage(tk.Frame):
         self._atualizar_tabela()
 
     def on_show(self):
-     self.usuarioLogado = self.api_client.getDadosLogado()
-     self.bem_vindo_label = tk.Label(
-        self.header_frame,
-            text=f"Bem vindo(a), {self.usuarioLogado.nome}",
-            font=('Arial', 12, 'bold'),
-            bg="#F9F9F9",
-            anchor="w"
-        )
-     self.bem_vindo_label.pack(side="left", padx=15, pady=10)
+        self.usuarioLogado = self.api_client.getDadosLogado()
+        if hasattr(self, 'bem_vindo_label'):
+            self.bem_vindo_label.configure(text=f"Bem vindo(a), {self.usuarioLogado.nome}")
+        else:
+            self.bem_vindo_label = ctk.CTkLabel(
+                self.header_frame,
+                text=f"Bem vindo(a), {self.usuarioLogado.nome}",
+                font=('Arial', 30, 'bold'),
+                text_color="#333333",
+                anchor="w"
+            )
+            self.bem_vindo_label.pack(side="left", padx=15, pady=10)
 
-
+   
 
     def _criar_interface_filtro(self):
         filtro_frame = tk.LabelFrame(self.frame, text="Filtrar Eventos", font=('Arial', 12), bg=self.form_bg, fg="#333333")
