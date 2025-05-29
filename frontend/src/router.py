@@ -9,7 +9,7 @@ class AppRouter(tk.Tk):
         self.api_client = ApiClient()
         self.title("Role do Dia")
         self.state("zoomed")  # Maximiza a janela
-        self.attributes("-alpha", 0.97)
+        self.attributes("-alpha", 1)
 
         container = tk.Frame(self)
         container.pack(fill="both", expand=True)

@@ -29,16 +29,6 @@ class HomePage(tk.Frame):
 
         self.bind("<Configure>", self.atualizar_imagem)
 
-        """ # Frame central com tamanho fixo
-        self.frame = ctk.CTkFrame(
-            self,
-            fg_color=self.form_bg,
-            corner_radius=15,
-            width=800,  # Ajuste conforme necessário
-            height=300
-        )
-        self.frame.place(relx=0.5, rely=0.5, anchor="center") """
-
         self.frame = ctk.CTkFrame(self, corner_radius=15)
         self.frame.pack(expand=True, pady=40, padx=20)
 
@@ -219,9 +209,9 @@ class HomePage(tk.Frame):
                 msg_erro = f"{resultado['error']}\n{resultado.get('details', '')}"
                 Alerta(self.frame,msg_erro,tipo="erro")
         else:
+            Alerta(self.frame, "Login realizado com sucesso!", tipo="sucesso")
             token = resultado.get("access_token")
             if token:
-                Alerta(self.frame, "Login realizado com sucesso!", tipo="sucesso")
                 self.api_client.token = token
                 dadosUsuario = self.api_client.getDadosLogado()
                 if( dadosUsuario.tipo == 1):

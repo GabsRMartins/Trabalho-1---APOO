@@ -39,5 +39,17 @@ class Validador:
         if not self.validar_senha(senha):
             erros.append("Senha deve ter pelo menos 6 caracteres.")
         return erros if erros else None    
+    
+    def validar_numeros(self, valor: str) -> bool:
+        return valor.isdigit() or valor == ""
+
+    def validar_decimal(self, valor: str) -> bool:
+        try:
+            if valor == "":
+                return True
+            float(valor.replace(",", "."))
+            return True
+        except ValueError:
+            return False
 
    

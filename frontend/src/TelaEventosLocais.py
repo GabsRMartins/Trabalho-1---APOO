@@ -5,6 +5,8 @@ from PIL import Image, ImageTk
 from ApiClient import ApiClient
 from Components.logout_button import LogoutButton
 import customtkinter as ctk
+from Components.detalhes_evento_frame import DetalhesEventoFrame
+from Utils.validador import Validador
 
 
 # class Evento:
@@ -16,26 +18,18 @@ import customtkinter as ctk
 
 class EventPage(tk.Frame):
     def __init__(self, parent, controller):
-        super().__init__(parent)
-        self.form_bg = "#F9F9F9"
+        super().__init__(parent, bg="#E3F2FD") 
+        self.form_bg = "#4ABFB0" 
+        
         self.controller = controller
         self.api_client = controller.api_client
+        self.validador = Validador()
         self.usuarioLogado = None 
         self.carregado = False
         self.eventos_originais = self.api_client.getEventos()
         self.eventos_filtrados = list(self.eventos_originais)  
         self.eventos_escolhidos = set()  # Armazena índices dos eventos escolhidos
 
-        try:
-            self.original_image = Image.open("../assets/background_events.png")
-        except FileNotFoundError:
-            self.original_image = Image.new("RGB", (1, 1), "white")
-      
-
-        self.bg_photo = ImageTk.PhotoImage(self.original_image)
-        self.bg_label = tk.Label(self, image=self.bg_photo)
-        self.bg_label.place(x=0, y=0, relwidth=1, relheight=1)
-        self.bind("<Configure>", self.atualizar_imagem)
 
         self.frame = tk.Frame(self, bg=self.form_bg, padx=20, pady=20)
         self.frame.place(relx=0.5, rely=0.5, anchor="center")
@@ -77,34 +71,137 @@ class EventPage(tk.Frame):
    
 
     def _criar_interface_filtro(self):
-        filtro_frame = tk.LabelFrame(self.frame, text="Filtrar Eventos", font=('Arial', 12), bg=self.form_bg, fg="#333333")
+        validador = Validador()
+
+        filtro_frame = ctk.CTkFrame(self.frame, corner_radius=10, fg_color="#E3F2FD")
         filtro_frame.pack(pady=(0, 10), padx=10, fill="x")
 
-        tk.Label(filtro_frame, text="Nome:", font=('Arial', 10), bg=self.form_bg).grid(row=0, column=0, padx=5, pady=5, sticky="w")
-        self.nome_filtro = tk.StringVar()
-        tk.Entry(filtro_frame, textvariable=self.nome_filtro, font=('Arial', 10), width=20).grid(row=0, column=1, padx=5, pady=5)
+        titulo = ctk.CTkLabel(filtro_frame, text="🎯 Filtrar Eventos", font=("Arial", 16, "bold"), text_color="#0D47A1")
+        titulo.grid(row=0, column=0, columnspan=9, pady=(10, 10), sticky="w", padx=10)
 
-        tk.Label(filtro_frame, text="Horário:", font=('Arial', 10), bg=self.form_bg).grid(row=0, column=2, padx=5, pady=5, sticky="w")
-        self.horario_filtro = tk.StringVar()
-        tk.Entry(filtro_frame, textvariable=self.horario_filtro, font=('Arial', 10), width=20).grid(row=0, column=3, padx=5, pady=5)
+        # Variáveis
+        self.nome_filtro = ctk.StringVar()
+        self.horario_filtro = ctk.StringVar()
+        self.local_filtro = ctk.StringVar()
+        self.preco_filtro = ctk.StringVar()
 
-        tk.Label(filtro_frame, text="Local:", font=('Arial', 10), bg=self.form_bg).grid(row=0, column=4, padx=5, pady=5, sticky="w")
-        self.local_filtro = tk.StringVar()
-        tk.Entry(filtro_frame, textvariable=self.local_filtro, font=('Arial', 10), width=20).grid(row=0, column=5, padx=5, pady=5)
+  
 
-        tk.Label(filtro_frame, text="Preço Máximo:", font=('Arial', 10), bg=self.form_bg).grid(row=0, column=6, padx=5, pady=5, sticky="w")
-        self.preco_filtro = tk.StringVar()
-        tk.Entry(filtro_frame, textvariable=self.preco_filtro, font=('Arial', 10), width=10).grid(row=0, column=7, padx=5, pady=5)
+        vcmd = self.register(validador.validar_numeros)  # Registrar o método externo
 
-        tk.Button(filtro_frame, text="Filtrar", font=('Arial', 10, 'bold'), bg="#2196F3", fg="white",
-                  command=self._aplicar_filtro).grid(row=0, column=8, padx=10, pady=5)
+        campos = [
+            ("Nome:", self.nome_filtro, None),
+            ("Horário:", self.horario_filtro, vcmd),
+            ("Local:", self.local_filtro, None),
+            ("Preço Máximo:", self.preco_filtro, vcmd)
+        ]
 
-        tk.Button(filtro_frame, text="Limpar Filtro", font=('Arial', 10), command=self._limpar_filtro).grid(row=1, column=0, columnspan=7, pady=5)
+        for i, (label_text, var, val_cmd) in enumerate(campos):
+            ctk.CTkLabel(filtro_frame, text=label_text, font=('Arial', 12), text_color="#0D47A1")\
+                .grid(row=1, column=i*2, padx=5, pady=5, sticky="w")
+            entry = ctk.CTkEntry(filtro_frame, textvariable=var, width=150)
+            if val_cmd:
+                entry.configure(validate="key", validatecommand=(val_cmd, "%P"))
+            entry.grid(row=1, column=i*2+1, padx=5, pady=5)
+
+        entry_horario = ctk.CTkEntry(filtro_frame, textvariable=self.horario_filtro, width=150)
+        entry_horario.grid(row=1, column=3, padx=5, pady=5)
+        entry_horario.bind("<KeyRelease>", lambda e: self.mascarar_horario_valido(self.horario_filtro)) 
+
+        entry_preco = ctk.CTkEntry(filtro_frame, textvariable=self.preco_filtro, width=150)
+        entry_preco.grid(row=1, column=7, padx=5, pady=5)
+        entry_preco.bind("<KeyRelease>", lambda e: self.mascarar_preco_valido(self.preco_filtro))
+                
+
+        ctk.CTkButton(
+            filtro_frame, text="🔍 Filtrar", command=self._aplicar_filtro,
+            fg_color="#2196F3", hover_color="#1976D2", text_color="white", width=100
+        ).grid(row=1, column=8, padx=10, pady=5)
+
+        ctk.CTkButton(
+            filtro_frame, text="❌ Limpar Filtro", command=self._limpar_filtro,
+            fg_color="#F44336", hover_color="#D32F2F", text_color="white", width=150
+        ).grid(row=2, column=0, columnspan=9, pady=10)
+
+
+    def mascarar_horario_valido(self,var: ctk.StringVar):
+        valor = var.get()
+        apenas_digitos = ''.join(filter(str.isdigit, valor))[:4]  # pega só os primeiros 4 dígitos
+
+        if len(apenas_digitos) == 0:
+            resultado = ""
+        elif len(apenas_digitos) == 1:
+            # Aceita 0 a 2 no primeiro dígito
+            if apenas_digitos[0] > '2':
+                resultado = "2"
+            else:
+                resultado = apenas_digitos
+        elif len(apenas_digitos) == 2:
+            # Valida as horas de 00 a 23
+            horas = int(apenas_digitos)
+            if horas > 23:
+                resultado = "23"
+            else:
+                resultado = f"{horas:02d}"
+        elif len(apenas_digitos) == 3:
+            # Formato: HH:M, minuto incompleto, completa com 0
+            horas = int(apenas_digitos[:2])
+            minutos_1 = int(apenas_digitos[2])
+            if horas > 23:
+                horas = 23
+            if minutos_1 > 5:  # minutos não podem começar com >5
+                minutos_1 = 5
+            resultado = f"{horas:02d}:{minutos_1}0"
+        else:  # 4 dígitos completos HHMM
+            horas = int(apenas_digitos[:2])
+            minutos = int(apenas_digitos[2:])
+            if horas > 23:
+                horas = 23
+            if minutos > 59:
+                minutos = 59
+            resultado = f"{horas:02d}:{minutos:02d}"
+
+        var.set(resultado)
+
+    def mascarar_preco_valido(self,var: ctk.StringVar):
+        valor = var.get()
+
+        # Remove caracteres inválidos (só números e vírgula ou ponto)
+        valor = valor.replace(",", ".")  # aceita vírgula como ponto
+        permitido = ''.join(c for c in valor if c.isdigit() or c == '.')
+
+        # Divide em parte inteira e decimal
+        if '.' in permitido:
+            partes = permitido.split('.', 1)
+            inteiro = partes[0]
+            decimal = partes[1][:2]  # apenas 2 casas decimais
+            resultado = f"{inteiro}.{decimal}"
+        else:
+            resultado = permitido
+
+        var.set(resultado)
+
+
 
     def _criar_tabela(self):
-        self.titulo_tabela = tk.Label(self.frame, text="Lista de Eventos", font=('Arial', 20, 'bold'),
-                                     bg=self.form_bg, fg="#333333")
+        self.titulo_tabela = ctk.CTkLabel(
+            self.frame,
+            text="📋 Lista de Eventos",
+            font=('Arial', 20, 'bold'),
+            text_color="#333333"
+        )
         self.titulo_tabela.pack(pady=(0, 10))
+
+        # Estilo para o Treeview
+        style = ttk.Style()
+        style.theme_use("default")
+        style.configure("Treeview",
+                        background="#FFFFFF",
+                        foreground="#000000",
+                        rowheight=28,
+                        fieldbackground="#F9F9F9",
+                        font=('Arial', 11))
+        style.map('Treeview', background=[('selected', '#90CAF9')])
 
         colunas = ("Selecionar", "Nome", "Horário", "Local", "Preço")
         self.tree = ttk.Treeview(self.frame, columns=colunas, show="headings")
@@ -113,12 +210,10 @@ class EventPage(tk.Frame):
         self.tree.column("Selecionar", width=90, anchor="center")
         for coluna in colunas[1:]:
             self.tree.heading(coluna, text=coluna)
-            self.tree.column(coluna, width=150, anchor="center")
+            self.tree.column(coluna, width=160, anchor="center")
 
-        self.tree.pack(expand=True, fill="both")
-
-        # Adiciona evento de clique duplo para selecionar/deselecionar
-        self.tree.bind("<Double-1>", self._on_treeview_double_click)
+        self.tree.pack(expand=True, fill="both", padx=10, pady=10)
+        self.tree.bind("<<TreeviewSelect>>", self._mostrar_detalhes_evento)
 
     def _atualizar_tabela(self):
         for item in self.tree.get_children():
@@ -129,21 +224,38 @@ class EventPage(tk.Frame):
             selecionado = "✔" if evento_id in self.eventos_escolhidos else ""
             self.tree.insert("", tk.END, iid=idx, values=(selecionado, evento.nome, evento.horario, evento.local, f"R$ {evento.preco:.2f}"))
 
-    def _on_treeview_double_click(self, event):
-        item_id = self.tree.identify_row(event.y)
-        if not item_id:
-            return
-        idx = int(item_id)
-        if idx >= len(self.eventos_filtrados):
-            return
-        evento = self.eventos_filtrados[idx]
-        evento_id = (evento.nome, evento.horario, evento.local, evento.preco)
-        if evento_id in self.eventos_escolhidos:
-            self.eventos_escolhidos.remove(evento_id)
-        else:
-            self.eventos_escolhidos.add(evento_id)
-        self._atualizar_tabela()
 
+    def _mostrar_detalhes_evento(self, event):
+        selected_item = self.tree.selection()
+        if not selected_item:
+            return
+
+        idx = int(selected_item[0])
+        evento = self.eventos_filtrados[idx]
+
+        if hasattr(self, "painel_detalhes") and self.painel_detalhes.winfo_exists():
+            self.painel_detalhes.destroy()
+
+        self.painel_detalhes = DetalhesEventoFrame(self, evento, self.define_foto_nome)
+
+
+    def define_foto_nome(self, nome):
+     fotos = {
+        "ExpoAnime BH": "../assets/Anime.png",
+        "Festival de Música de BH": "../assets/FestivalMusica.jpg",
+        "Festival Literário BH": "../assets/FestivalLiterario.png",
+        "Feira de Tecnologia 2025": "../assets/FeiraTecnologia.jpg",
+        "BH Gastrô": "../assets/BhGastro.jpeg",
+        "Mostra de Cinema Mineiro": "../assets/CinemaMineiro.png",
+        "Encontro de Startups": "../assets/WeWork.png",
+        "Corrida da Liberdade": "../assets/CorridaLiberdade.png",
+        "Congresso de Arquitetura": "../assets/Arquitetura.png",
+        "Simpósio de Saúde Mental": "../assets/SaudeMental.png"
+
+     }
+
+     return fotos.get(nome, "../assets/default.png")
+    
     def mostrar_eventos_escolhidos(self):
         if not self.eventos_escolhidos:
             messagebox.showinfo("Meus Eventos", "Nenhum evento selecionado.")
@@ -160,7 +272,7 @@ class EventPage(tk.Frame):
         nome_digitado = self.nome_filtro.get().lower()
         horario_digitado = self.horario_filtro.get()
         local_digitado = self.local_filtro.get().lower()
-        preco_max_str = self.preco_filtro.get()
+        preco_max_str = self.preco_filtro.get().replace(",", ".")
         preco_max = float('inf')
         if preco_max_str:
             try:
@@ -189,17 +301,6 @@ class EventPage(tk.Frame):
         self.eventos_filtrados = list(self.eventos_originais)
         self._atualizar_tabela()
 
-    def atualizar_imagem(self, event):
-        largura = self.winfo_width()
-        altura = self.winfo_height()
-        imagem_resized = self.original_image.resize((largura, altura), Image.LANCZOS).convert("RGBA")
-
-        alpha = 0.3
-        white_bg = Image.new("RGBA", imagem_resized.size, (255, 255, 255, int(255 * (1 - alpha))))
-        imagem_opaca = Image.blend(white_bg, imagem_resized, alpha)
-
-        self.bg_photo = ImageTk.PhotoImage(imagem_opaca)
-        self.bg_label.config(image=self.bg_photo)
 
     # Essa função é apenas para simular a inserção de eventos. Usuários ativos não criam novos eventos.
     def inserir_evento(self, evento):
@@ -207,6 +308,4 @@ class EventPage(tk.Frame):
         self.eventos_filtrados.append(evento)
         self._atualizar_tabela()
 
-    # def logout(self):
-    #     # Definir o comportamento do logout (ir para a tela de login e cadastro)
-    #     self.parent.destroy()
+  
