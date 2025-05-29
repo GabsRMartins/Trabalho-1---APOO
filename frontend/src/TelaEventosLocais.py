@@ -118,7 +118,8 @@ class EventPage(tk.Frame):
         self.tree.pack(expand=True, fill="both")
 
         # Adiciona evento de clique duplo para selecionar/deselecionar
-        self.tree.bind("<Double-1>", self._on_treeview_double_click)
+       # self.tree.bind("<Double-1>", self._on_treeview_double_click)
+        self.tree.bind("<<TreeviewSelect>>", self._mostrar_detalhes_evento)
 
     def _atualizar_tabela(self):
         for item in self.tree.get_children():
@@ -129,7 +130,7 @@ class EventPage(tk.Frame):
             selecionado = "✔" if evento_id in self.eventos_escolhidos else ""
             self.tree.insert("", tk.END, iid=idx, values=(selecionado, evento.nome, evento.horario, evento.local, f"R$ {evento.preco:.2f}"))
 
-    def _on_treeview_double_click(self, event):
+    """  def _on_treeview_double_click(self, event):
         item_id = self.tree.identify_row(event.y)
         if not item_id:
             return
@@ -142,7 +143,108 @@ class EventPage(tk.Frame):
             self.eventos_escolhidos.remove(evento_id)
         else:
             self.eventos_escolhidos.add(evento_id)
-        self._atualizar_tabela()
+        self._atualizar_tabela() """
+
+    def _mostrar_detalhes_evento(self, event):
+        selected_item = self.tree.selection()
+        if not selected_item:
+            return
+
+        idx = int(selected_item[0])
+        evento = self.eventos_filtrados[idx]
+
+        if hasattr(self, "painel_detalhes") and self.painel_detalhes.winfo_exists():
+            self.painel_detalhes.destroy()
+
+        self.painel_detalhes = ctk.CTkFrame(self, width=300, corner_radius=10)
+        self.painel_detalhes.pack(side="right", fill="y", padx=10, pady=10)
+        # Barra superior com botões de ação
+        top_bar = ctk.CTkFrame(self.painel_detalhes, fg_color="transparent")
+        top_bar.pack(fill="x", pady=(5, 0), padx=5)
+
+        # Botão de fechar
+        botao_fechar = ctk.CTkButton(
+            top_bar, text="❌", width=30, height=30, fg_color="transparent", hover_color="#eeeeee",
+            command=self.painel_detalhes.destroy
+        )
+        botao_fechar.pack(side="right", padx=(0, 5))
+
+        
+
+        # Imagem no topo
+        image_path = self.define_foto_nome(evento.nome)
+        try:
+            img = ctk.CTkImage(dark_image=Image.open(image_path), size=(280, 180))
+            ctk.CTkLabel(self.painel_detalhes, image=img, text="").pack(pady=(10, 5))
+            self.imagem_atual = img
+        except Exception as e:
+            print(f"Erro ao carregar imagem: {e}")
+
+        # Faixa de título
+        titulo_frame = ctk.CTkFrame(self.painel_detalhes, fg_color="#4ABFB0", corner_radius=8)
+        titulo_frame.pack(fill="x", pady=(5, 10), padx=10)
+
+        nome_favorito_frame = ctk.CTkFrame(titulo_frame, fg_color="transparent")
+        nome_favorito_frame.pack(fill="x", padx=10, pady=5)
+
+        ctk.CTkLabel(nome_favorito_frame, text=evento.nome, text_color="white", font=("Arial", 16, "bold")).pack(side="left")
+
+        # Estado de favorito
+        self.favoritado = False
+
+        # Labels com ícones e faixas coloridas leves
+        info_frame = ctk.CTkFrame(self.painel_detalhes, fg_color="#f0f0f0", corner_radius=10)
+        info_frame.pack(fill="both", expand=True, padx=10, pady=5)
+
+        ctk.CTkLabel(info_frame, text=f"🕒 Horário: {evento.horario}", anchor="w").pack(pady=4, padx=10, fill="x")
+        ctk.CTkLabel(info_frame, text=f"📍 Local: {evento.local}", anchor="w").pack(pady=4, padx=10, fill="x")
+        ctk.CTkLabel(info_frame, text=f"💰 Preço: R$ {evento.preco:.2f}", anchor="w").pack(pady=4, padx=10, fill="x")
+
+        self.icone_off = ctk.CTkImage(light_image=Image.open("../assets/heart_outline.png"), size=(24, 24))
+        self.icone_on = ctk.CTkImage(light_image=Image.open("../assets/heart_filled.png"), size=(24, 24))
+
+        # Botão de favoritar
+        self.botao_favoritar = ctk.CTkButton(
+            nome_favorito_frame,
+            image=self.icone_off,
+            text="",
+            width=36,
+            height=36,
+            fg_color="transparent",     
+            hover_color="#66bb6a",
+            corner_radius=18,
+            command=self.toggle_favorito
+        )
+        self.botao_favoritar.pack(side="right", padx=5)
+        
+        
+    def toggle_favorito(self):
+        self.favoritado = not self.favoritado
+        if self.favoritado:
+            self.botao_favoritar.configure(image=self.icone_on, fg_color="#ff4d4d",hover_color="#ff4d4d")  # fundo vermelho
+        else:
+            self.botao_favoritar.configure(image=self.icone_off, fg_color="transparent",hover_color="#66bb6a",) 
+    
+      
+
+
+    def define_foto_nome(self, nome):
+     fotos = {
+        "ExpoAnime BH": "../assets/Anime.png",
+        "Festival de Música de BH": "../assets/FestivalMusica.jpg",
+        "Festival Literário BH": "../assets/FestivalLiterario.png",
+        "Feira de Tecnologia 2025": "../assets/FeiraTecnologia.jpg",
+        "BH Gastrô": "../assets/BhGastro.jpeg",
+        "Mostra de Cinema Mineiro": "../assets/CinemaMineiro.png",
+        "Encontro de Startups": "../assets/WeWork.png",
+        "Corrida da Liberdade": "../assets/CorridaLiberdade.png",
+        "Congresso de Arquitetura": "../assets/Arquitetura.png",
+        "Simpósio de Saúde Mental": "../assets/SaudeMental.png"
+
+     }
+
+     return fotos.get(nome, "../assets/default.png")
+
 
     def mostrar_eventos_escolhidos(self):
         if not self.eventos_escolhidos:

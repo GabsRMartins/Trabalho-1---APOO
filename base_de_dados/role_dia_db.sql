@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS eventos (
     id_usuario INTEGER NOT NULL,
     criado_em DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_usuario) REFERENCES usuario(id) ON DELETE CASCADE
-     UNIQUE (nome_evento, local_evento, horario) 
+    UNIQUE (nome_evento, local_evento, horario) 
 );
 
 CREATE TABLE IF NOT EXISTS locais (

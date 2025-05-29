@@ -29,16 +29,6 @@ class HomePage(tk.Frame):
 
         self.bind("<Configure>", self.atualizar_imagem)
 
-        """ # Frame central com tamanho fixo
-        self.frame = ctk.CTkFrame(
-            self,
-            fg_color=self.form_bg,
-            corner_radius=15,
-            width=800,  # Ajuste conforme necessário
-            height=300
-        )
-        self.frame.place(relx=0.5, rely=0.5, anchor="center") """
-
         self.frame = ctk.CTkFrame(self, corner_radius=15)
         self.frame.pack(expand=True, pady=40, padx=20)
 
