@@ -6,6 +6,6 @@ class Entidade(ABC):
         pass
     
     @abstractmethod
-    def print(self):
+    def _getNome(self):
         pass
 

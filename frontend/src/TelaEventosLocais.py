@@ -7,12 +7,12 @@ from Components.logout_button import LogoutButton
 import customtkinter as ctk
 
 
-class Evento:
-    def __init__(self, nome, horario, local, preco):
-        self.nome = nome
-        self.horario = horario
-        self.local = local
-        self.preco = preco
+# class Evento:
+#     def __init__(self, nome, horario, local, preco):
+#         self.nome = nome
+#         self.horario = horario
+#         self.local = local
+#         self.preco = preco
 
 class EventPage(tk.Frame):
     def __init__(self, parent, controller):

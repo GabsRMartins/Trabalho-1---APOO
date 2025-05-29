@@ -5,7 +5,7 @@ from service import MapaService
 from entity import Evento
 class Promotor(Usuario):
 
-    def __init__(self,nome: str, senha: str):
+    def __init__(self, nome: str, senha: str):
         super.__init__(nome,senha)
         self.eventos = []
 
@@ -15,3 +15,5 @@ class Promotor(Usuario):
 
     def _removerEvento(self, evento):            
         evento.removerEvento()
+
+        
