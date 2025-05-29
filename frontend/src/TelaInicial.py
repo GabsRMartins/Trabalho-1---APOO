@@ -209,9 +209,9 @@ class HomePage(tk.Frame):
                 msg_erro = f"{resultado['error']}\n{resultado.get('details', '')}"
                 Alerta(self.frame,msg_erro,tipo="erro")
         else:
+            Alerta(self.frame, "Login realizado com sucesso!", tipo="sucesso")
             token = resultado.get("access_token")
             if token:
-                Alerta(self.frame, "Login realizado com sucesso!", tipo="sucesso")
                 self.api_client.token = token
                 dadosUsuario = self.api_client.getDadosLogado()
                 if( dadosUsuario.tipo == 1):
