@@ -215,9 +215,9 @@ class HomePage(tk.Frame):
                 self.api_client.token = token
                 dadosUsuario = self.api_client.getDadosLogado()
                 if( dadosUsuario.tipo == 1):
-                 self.controller.show_frame("EventPage")
+                    self.controller.show_frame("EventPage")
                 else:
-                 self.controller.show_frame("TelaCadastro")   
+                    self.controller.show_frame("EventRegister")   
             else:
                 msg_erro =  "Token de acesso não encontrado na resposta."
                 Alerta(self.frame, msg_erro, tipo="erro") 
