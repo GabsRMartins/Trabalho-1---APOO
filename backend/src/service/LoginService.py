@@ -1,10 +1,10 @@
+from ....base_de_dados.base_dados import Base_Dados
 
-from base_de_dados.base_dados import Base_Dados
 class LoginService:
     def __init__(self, db: Base_Dados):
         self.db = db
 
-    def autenticar(self, username, password):
+    def autenticar(self, username: str, password: str) -> bool:
         usuarios = self.db.get_usuario(username)
         if not usuarios:
             print("Usuário não encontrado.")
@@ -21,7 +21,7 @@ class LoginService:
             return False
 
 
-    def cadastrar(self, username, email, password, tipo):
+    def cadastrar(self, username: str, email: str, password: str, tipo: int) -> bool:
         try:
             self.db.cadastrar(username ,email, password,  tipo)
             print("Usuário cadastrado com sucesso!")

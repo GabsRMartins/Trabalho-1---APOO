@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS eventos (
     id_usuario INTEGER NOT NULL,
     criado_em DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_usuario) REFERENCES usuario(id) ON DELETE CASCADE
+    UNIQUE (nome_evento, local_evento, horario) 
 );
 
 CREATE TABLE IF NOT EXISTS locais (
@@ -29,7 +30,7 @@ CREATE TABLE IF NOT EXISTS locais (
 );
 
 
-INSERT INTO eventos (nome_evento, local_evento, horario, organizadora,preco, id_usuario) VALUES
+INSERT OR IGNORE INTO  eventos (nome_evento, local_evento, horario, organizadora,preco, id_usuario) VALUES
 ('Festival de Música de BH', 'Praça da Estação','19:00' , 'Cultura BH',100, 1),
 ('Feira de Tecnologia 2025', 'Expominas','20:00', 'TechWorld',100, 2),
 ('BH Gastrô', 'Parque Municipal', '20:25','Sabores do Brasil',50, 3),

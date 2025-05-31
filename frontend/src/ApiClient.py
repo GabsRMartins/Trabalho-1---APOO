@@ -6,7 +6,7 @@ from Interface.UsuarioInterface import UsuarioInterface
 
 class ApiClient:
     def __init__(self):
-        self.base_url = "http://localhost:5000"
+        self.base_url = "http://localhost:8000"
         self.token = None 
 
     def _get_headers(self):
@@ -88,10 +88,23 @@ class ApiClient:
             usuario_dict = response.json()
             return UsuarioInterface(
                 nome=usuario_dict["nome"],
-                email=usuario_dict["email"]
+                email=usuario_dict["email"],
+                tipo=usuario_dict["tipo"]
             )
         except requests.exceptions.HTTPError as e:
             print(f"Erro HTTP: {e.response.status_code} - {e.response.text}")
         except requests.exceptions.RequestException as e:
             print(f"Erro de conexão: {e}")
         return None
+    
+    def logout(self):
+        url = f"{self.base_url}/logout"
+        payload = { "jti": self.token}
+        try:
+            response = requests.post(url,payload)
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.HTTPError as e:
+            return {"error": f"Erro HTTP: {e.response.status_code}", "details": e.response.text}
+        except requests.exceptions.RequestException as e:
+            return {"error": "Erro de conexão", "details": str(e)}

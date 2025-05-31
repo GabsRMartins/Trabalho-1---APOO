@@ -1,5 +1,5 @@
-from entity.Usuario import Usuario
-from base_de_dados.base_dados import Base_Dados
+from ..entity.Usuario import Usuario
+from ....base_de_dados.base_dados import Base_Dados
 
 class UsuarioService(Usuario):
 
@@ -20,7 +20,6 @@ class UsuarioService(Usuario):
     def buscarUsuarioId(self, id,base: Base_Dados) -> Usuario:
         try:
             id_usuario = base.get_usuario_id(id)
-            print(id_usuario)
             if id_usuario:
                 tupla = id_usuario[0]
                 return Usuario(tupla[1], tupla[2], tupla[3], tupla[4])
@@ -36,6 +35,9 @@ class UsuarioService(Usuario):
     def getSenha(self) -> str:
         return super()._getSenha()
     
+    def getTipo(self):
+        return super()._getTipo()
+
     def mudarSenhaUsuario(self, senha):
         super().setSenha(senha)
 

@@ -1,5 +1,5 @@
-from entity.Mapa import Mapa
-from entity.Entidade import Entidade
+from ..entity.Mapa import Mapa
+from ..entity.Entidade import Entidade
 
 class MapaService(Mapa):
 

@@ -3,13 +3,14 @@ from TelaInicial import HomePage
 from TelaMapa import MapPage
 from TelaEventosLocais import EventPage
 from ApiClient import ApiClient
+from TelaCadastraEvento import EventRegister
 class AppRouter(tk.Tk):
     def __init__(self):
         super().__init__()
         self.api_client = ApiClient()
         self.title("Role do Dia")
         self.state("zoomed")  # Maximiza a janela
-        self.attributes("-alpha", 0.97)
+        self.attributes("-alpha", 1)
 
         container = tk.Frame(self)
         container.pack(fill="both", expand=True)
@@ -18,7 +19,7 @@ class AppRouter(tk.Tk):
 
         self.frames = {}
 
-        for F in (HomePage, MapPage, EventPage):  # Adicione novas páginas aqui
+        for F in (HomePage, MapPage, EventPage, EventRegister):  # Adicione novas páginas aqui
             page_name = F.__name__
             frame = F(parent=container, controller=self)
             self.frames[page_name] = frame
