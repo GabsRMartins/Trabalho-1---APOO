@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import messagebox
 from PIL import Image, ImageTk
 import requests
-from ApiClient import ApiClient
+from .ApiClient import ApiClient
 from tkinter import ttk
 
 class HomePage(tk.Frame):

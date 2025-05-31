@@ -1,23 +1,27 @@
 from ..entity.Ativo import Ativo
 from ..entity.Evento import Evento
 from ..entity.Mapa import Mapa
+from .MapaService import MapaService
+from .LocalService import LocalService
 
 class AtivoService(Ativo):
 
-    def __init__(self):
-        pass
+    def __init__(self, ativo: Ativo):
+
+        self.ativo = ativo
+        
     
     def acessarMapa(self, mapa: Mapa):
-        return super()._acessarMapa(mapa)
+        return self.ativo._acessarMapa(mapa)
     
     def acessarEventos(self, evento: Evento):
-        return super()._selecionaEventos(evento)
+        return self.ativo._selecionaEventos(evento)
     
     def retornaEventos(self):
-        return super()._retornaEventos()
+        return self.ativo._retornaEventos()
     
     def removerEventos(self, evento: Evento):
-        return super()._removerEventos(evento)
+        return self.ativo._removerEventos(evento)
 
 if __name__ == "__main__":
 
@@ -25,16 +29,22 @@ if __name__ == "__main__":
 
     usuario1 = Ativo("João", "ABC1234")
 
-    atvService = AtivoService()
+    atvService = AtivoService(usuario1)
 
-    mapa = Mapa() 
+    mapa = Mapa()
+    mapaService = MapaService(mapa)
 
     locais = [Local("Barzinho do Zé", "Rua 1", "Centro", "0123-456", "8:00", 50), Local("Restaurante da Maria", "Rua 2", "Barreiro", "0321-654", "12:00", 100)
             , Local("Hall de Eventos", "Rua 3", "Santa Amélia", "0456-789", "20:00", 200)]
     
     for local in locais:
-        mapa._adicionarEntidade(local)
+        mapaService.adicionarEntidade(local)
 
     mapa1 = atvService.acessarMapa(mapa)
+
     print("Locais cadastrados no mapa: ")
-    print(mapa1)
+    
+    for local in locais:
+        localService = LocalService(local)
+        print(localService.getNome(), localService.getRua(), localService.getBairro(), localService.getCep(), localService.getHorarioFuncionamento(), localService.getMaxPessoas())
+    

@@ -12,15 +12,15 @@ class Ativo(Usuario):
     def _acessarMapa(self, mapa: MapaService):
         return mapa._retornarMapa()
 
-    def _selecionaEventos(self, evento: Evento):
+    def _selecionaEvento(self, evento: Evento):
 
         if evento not in self.listaEventos:
             self.listaEventos.append(evento)      
 
-    def _retornaEventos(self):
+    def _retornaEvento(self):
         return self.listaEventos
     
-    def _removerEventos(self, evento: Evento):
+    def _removerEvento(self, evento: Evento):
         self.listaEventos.remove(evento)
 
 

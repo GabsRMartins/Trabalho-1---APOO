@@ -10,7 +10,6 @@ class Evento(Entidade):
         self.__preco = preco
         self.__fotos = fotos
 
-    
     def _getNome(self):
         return self.__nome
     

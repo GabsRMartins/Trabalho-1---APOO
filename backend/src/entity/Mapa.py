@@ -5,6 +5,7 @@ class Mapa:
     # Array de entidades, que podem ser Locais ou Eventos ou Usuários
     def __init__(self):
         self.__entidades = []
+        self.__numEntidades = 0
 
     def _getEntidades(self):
         return self.__entidades

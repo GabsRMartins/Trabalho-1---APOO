@@ -35,16 +35,16 @@ class EventoService(Evento):
     def setNome(self, nome: str):
         super()._setNome(nome)
 
-    def setHorario(self, horario):
+    def setHorario(self, horario: str):
         super()._setHorario(horario)
 
-    def setLocal(self, local):
+    def setLocal(self, local: str):
         super()._setLocal(local)
     
-    def setPreco(self, preco):
+    def setPreco(self, preco: float):
         super()._setPreco(preco)
     
-    def setFotos(self, fotos):
+    def setFotos(self, fotos: list[str]):
         super()._setFotos(fotos)
     
     

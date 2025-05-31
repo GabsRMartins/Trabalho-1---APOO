@@ -3,14 +3,14 @@ from ..entity.Entidade import Entidade
 
 class MapaService(Mapa):
 
-    def __init__(self):
-        pass
+    def __init__(self, mapa: Mapa):
+        self.mapa = mapa
 
     def adicionarEntidade(self, entidade: Entidade):
-        super()._adicionarEntidade(entidade)
+        self.mapa._adicionarEntidade(entidade)
 
     def removerEntidade(self, entidade: Entidade):
-        super()._removerEntidade(entidade)
+        self.mapa._removerEntidade(entidade)
 
     def retornarMapa(self):
-        super()._retornarMapa()
+        return self.mapa._retornarMapa()
