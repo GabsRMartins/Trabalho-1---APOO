@@ -1,5 +1,5 @@
-from ..entity.Usuario import Usuario
-from ....base_de_dados.base_dados import Base_Dados
+from entity.Usuario import Usuario
+from base_de_dados.base_dados import Base_Dados
 
 class UsuarioService(Usuario):
 
