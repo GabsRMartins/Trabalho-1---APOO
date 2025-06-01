@@ -35,6 +35,9 @@ class UsuarioService(Usuario):
     def getSenha(self) -> str:
         return super()._getSenha()
     
+    def getTipo(self):
+        return super()._getTipo()
+
     def mudarSenhaUsuario(self, senha):
         super().setSenha(senha)
 

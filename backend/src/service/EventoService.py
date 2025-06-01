@@ -31,6 +31,9 @@ class EventoService(Evento):
         print(f"Erro ao obter lista de eventos: {e}")
         return [] 
 
+    def getNome(self):
+        return super()._getNome()
+
     def getHorario(self):
         return super()._getHorario()
     
@@ -43,6 +46,9 @@ class EventoService(Evento):
     def getFotos(self):
         return super()._getFotos()
     
+    def setNome(self, nome: str):
+        super()._setNome(nome)
+
     def setHorario(self, horario):
         super()._setHorario(horario)
 

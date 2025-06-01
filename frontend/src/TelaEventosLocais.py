@@ -8,12 +8,12 @@ from Components.lista_frame import ListaFrame
 from Utils.validador import Validador
 
 
-class Evento:
-    def __init__(self, nome, horario, local, preco):
-        self.nome = nome
-        self.horario = horario
-        self.local = local
-        self.preco = preco
+# class Evento:
+#     def __init__(self, nome, horario, local, preco):
+#         self.nome = nome
+#         self.horario = horario
+#         self.local = local
+#         self.preco = preco
 
 class EventPage(tk.Frame):
     def __init__(self, parent, controller):

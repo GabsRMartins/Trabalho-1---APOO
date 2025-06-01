@@ -26,28 +26,34 @@ class Evento(Entidade):
             "criado_em": self.criado_em
         }
     def _getHorario(self):
-        return self.horario
+        return self.__horario
     
     def _getLocal(self):
-        return self.local
+        return self.__local
     
     def _getPreco(self):
-        return self.preco
+        return self.__preco
     
     def _getFotos(self):
-        return self.fotos
+        return self.__fotos
     
-    def _setHorario(self,horario):
-        self.horario = horario
+    def _setNome(self, nome: str):
+        self.__nome = nome
+
+    def _setHorario(self,horario: str):
+        self.__horario = horario
     
-    def _setLocal(self,local: Local):
-        self.local = local
+    def _setLocal(self,local: str):
+        self.__local = local
     
-    def _setPreco(self,preco):
-        self.preco = preco
+    def _setPreco(self,preco: float):
+        self.__preco = preco
     
-    def _setFotos(self,fotos):
-        self.fotos = fotos
+    def _setFotos(self,fotos: list[str]):
+        self.__fotos = fotos
+
+    def _getNome(self) ->str:
+        return self.__nome    
 
     def print(self):
         print(self.nome)    
