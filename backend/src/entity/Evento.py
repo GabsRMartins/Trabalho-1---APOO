@@ -52,6 +52,9 @@ class Evento(Entidade):
     def _setFotos(self,fotos: list[str]):
         self.__fotos = fotos
 
+    def _getNome(self) ->str:
+        return self.__nome    
+
     def print(self):
         print(self.nome)    
 

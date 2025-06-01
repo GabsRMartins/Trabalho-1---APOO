@@ -1,5 +1,5 @@
-from ..entity.Local import Local
-from ....base_de_dados.base_dados import Base_Dados
+from entity.Local import Local
+from base_de_dados.base_dados import Base_Dados
 
 class LocalService(Local):
 
