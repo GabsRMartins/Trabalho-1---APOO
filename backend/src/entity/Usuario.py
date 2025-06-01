@@ -25,12 +25,12 @@ class Usuario:
     def _getSenha(self):
         return self.__senha
     
-    def _setNome(self, nome):
-        self.nome = nome   
-
     def _getTipo(self):
         return self.__tipo
 
+    def _setNome(self, nome):
+        self.__nome = nome   
+
 # Depois substituir por um método de cryptografar 
-    def setSenha(self, senha):
-        self.senha = senha   
+    def _setSenha(self, senha):
+        self.__senha = senha   

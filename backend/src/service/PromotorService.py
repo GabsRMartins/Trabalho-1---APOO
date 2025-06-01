@@ -4,15 +4,16 @@ from ..service.EventoService import EventoService
 
 class PromotorService(Promotor):
 
-    def __init__(self):
-        pass
+    def __init__(self, promotor: Promotor):        
+        self.promotor = promotor
+
 
     def criarEvento(self, evento: EventoService, mapa: Mapa):
-        return super()._criarEvento(evento, mapa)
+        return self.promotor._criarEvento(evento, mapa)
     
     def removerEvento(self, evento):
-        return super()._removerEvento(evento)
+        return self.promotor._removerEvento(evento)
     
     def listarEventos(self):
-        return super()._listarEventos()
+        return self.promotor._listarEventos()
     
