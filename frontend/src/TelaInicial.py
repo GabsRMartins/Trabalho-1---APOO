@@ -44,7 +44,7 @@ class HomePage(tk.Frame):
     def build_form(self):
         self.label_bem_vindo = ctk.CTkLabel(
             self.frame,
-            text="Bem Vindo de Volta! Acessar Conta" if self.nome_shown else "Bem vindo! Criar Conta",
+            text="Bem Vindo de Volta! Acessar Conta" if not self.nome_shown else "Bem vindo! Criar Conta",
             font=('Arial', 20, 'bold'),
             text_color="#333333"
         )
@@ -78,9 +78,9 @@ class HomePage(tk.Frame):
 
         self.frame.grid_columnconfigure(0, weight=1)
 
-        self.label_usuario.grid(row=3, column=0, pady=(5, 0), sticky="w")
+        self.label_usuario.grid(row=3, column=0)
         self.entry_usuario.grid(row=4, column=0, pady=(0, 5))
-        self.label_senha.grid(row=5, column=0, pady=(10, 0), sticky="w")
+        self.label_senha.grid(row=5, column=0)
         self.entry_senha.grid(row=6, column=0, pady=(0, 10))
 
 
@@ -244,15 +244,4 @@ class HomePage(tk.Frame):
                 self.mostrar_formulario_login()
 
 
-    def atualizar_imagem(self, event):
-        largura = self.winfo_width()
-        altura = self.winfo_height()
-        imagem_resized = self.original_image.resize((largura, altura), Image.LANCZOS).convert("RGBA")
-
-        alpha = 0.3
-        white_bg = Image.new("RGBA", imagem_resized.size, (255, 255, 255, int(255 * (1 - alpha))))
-        imagem_opaca = Image.blend(white_bg, imagem_resized, alpha)
-
-        self.bg_photo = ImageTk.PhotoImage(imagem_opaca)
-        self.bg_label.config(image=self.bg_photo)
-        
+   
