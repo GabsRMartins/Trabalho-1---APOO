@@ -1,4 +1,4 @@
-from base_de_dados.base_dados import Base_Dados
+from ....base_de_dados.base_dados import Base_Dados
 
 class LoginService:
     def __init__(self, db: Base_Dados):

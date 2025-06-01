@@ -1,11 +1,14 @@
-from entity.Evento import Evento
-from base_de_dados.base_dados import Base_Dados
+from ..entity.Evento import Evento
+from ....base_de_dados.base_dados import Base_Dados
 from typing import List
 
 class EventoService(Evento):
 
-    def __init__(self):
-        pass
+    def __init__(self, evento: Evento):
+        
+        self.evento = evento
+        
+
 
     def buscarEvento(self, base: Base_Dados):
         try:
@@ -32,33 +35,33 @@ class EventoService(Evento):
         return [] 
 
     def getNome(self):
-        return super()._getNome()
+        return self.evento._getNome()
 
     def getHorario(self):
-        return super()._getHorario()
+        return self.evento._getHorario()
     
     def getLocal(self):
-        return super()._getLocal()
+        return self.evento._getLocal()
     
     def getPreco(self):
-        return super()._getPreco()
+        return self.evento._getPreco()
     
     def getFotos(self):
-        return super()._getFotos()
+        return self.evento._getFotos()
     
     def setNome(self, nome: str):
-        super()._setNome(nome)
+        self.evento._setNome(nome)
 
     def setHorario(self, horario):
-        super()._setHorario(horario)
+        self.evento._setHorario(horario)
 
     def setLocal(self, local):
-        super()._setLocal(local)
+        self.evento._setLocal(local)
     
     def setPreco(self, preco):
-        super()._setPreco(preco)
+        self.evento._setPreco(preco)
     
     def setFotos(self, fotos):
-        super()._setFotos(fotos)
+        self.evento._setFotos(fotos)
     
     

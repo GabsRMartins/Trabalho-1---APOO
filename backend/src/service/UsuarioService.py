@@ -1,10 +1,10 @@
-from entity.Usuario import Usuario
-from base_de_dados.base_dados import Base_Dados
+from ..entity.Usuario import Usuario
+from ....base_de_dados.base_dados import Base_Dados
 
 class UsuarioService(Usuario):
 
-    def __init__(self):
-        pass
+    def __init__(self, usuario: Usuario):
+        self.usuario = usuario
     
     def buscarUsuario(self, nome,base: Base_Dados) -> Usuario:
         try:
@@ -30,17 +30,17 @@ class UsuarioService(Usuario):
             return None    
 
     def getNome(self) -> str:
-        return super()._getNome()
+        return self.usuario._getNome()
     
     def getSenha(self) -> str:
-        return super()._getSenha()
+        return self.usuario._getSenha()
     
     def getTipo(self):
-        return super()._getTipo()
+        return self.usuario._getTipo()
 
     def mudarSenhaUsuario(self, senha):
-        super().setSenha(senha)
+        self.usuario.setSenha(senha)
 
     def mudarNomeUsuario(self, nome):
-        super().setNome(nome)
+        self.usuario.setNome(nome)
 
