@@ -58,6 +58,11 @@ class EventRegister(tk.Frame):
         self.entry_preco = tk.Entry(self.frame, font=('Arial', 12))
         self.entry_preco.pack(fill="x", pady=(5, 10))
 
+        self.label_preco = tk.Label(self.frame, text="Organizadora (R$):", bg=self.form_bg, font=('Arial', 12))
+        self.label_preco.pack(fill="x", pady=(5, 5))
+        self.entry_preco = tk.Entry(self.frame, font=('Arial', 12))
+        self.entry_preco.pack(fill="x", pady=(5, 10))
+
         # Botão de salvar
         self.button_salvar = tk.Button(
             self.frame,

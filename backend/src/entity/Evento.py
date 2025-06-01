@@ -25,6 +25,8 @@ class Evento(Entidade):
             "usuario": self.__usuario,
             "criado_em": self.criado_em
         }
+    def _getNome(self) -> str:
+        return self.nome
     def _getHorario(self):
         return self.__horario
     

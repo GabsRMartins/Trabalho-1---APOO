@@ -25,15 +25,14 @@ class EventoService(Evento):
         eventos = [
             Evento(*tupla) for tupla in lista_eventos_tuplas
         ]
-        print(eventos)
         return eventos
      except Exception as e:
         print(f"Erro ao obter lista de eventos: {e}")
         return [] 
-    def cadastrarEvento(self, nome: str, local: str, horario: int, preco: float, base: Base_Dados) -> None:
+
+    def cadastrarEvento(self, nome: str, local: str, horario: int, preco: float, organizadora: str, db: Base_Dados) -> None:
         try:
-            self.db.cadastrarEvento(nome ,local, horario,  preco, organizadora, id_usuario)
-            print("Usuário cadastrado com sucesso!")
+            db.cadastrarEvento(nome ,local, horario,  preco, organizadora)
             return True
         except Exception as e:
             print(f"Erro ao cadastrar usuário: {e}")
