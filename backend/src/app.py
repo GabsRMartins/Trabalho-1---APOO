@@ -67,6 +67,25 @@ def cadastrar():
         return jsonify({'message': 'Cadastro efetuado com sucesso'}), 200
     else:
         return jsonify({'error': 'Erro ao realizar cadastro'}), 400
+@app.route('/cadastrarEvento', methods=['POST'])
+def cadastrarEvento():
+    data = request.get_json()  
+    nome = data.get('nome')
+    local = data.get('local')
+    horario = data.get('horario')
+    preco = data.get('preco')
+    if not nome or not local or not horario or not preco:
+        return jsonify({'error': 'Dados Incompletos'}), 400
+
+    db = Base_Dados()
+    db.connect()
+    evento_service = EventoService(db)
+    cadastro = evento_service.cadastrarEvento(nome,local,horario,preco)
+    db.close()
+    if cadastro:
+        return jsonify({'message': 'Cadastro efetuado com sucesso'}), 200
+    else:
+        return jsonify({'error': 'Erro ao realizar cadastro'}), 401
 
 
 blacklist = set()

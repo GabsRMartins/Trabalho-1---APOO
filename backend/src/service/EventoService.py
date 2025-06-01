@@ -30,6 +30,14 @@ class EventoService(Evento):
      except Exception as e:
         print(f"Erro ao obter lista de eventos: {e}")
         return [] 
+    def cadastrarEvento(self, nome: str, local: str, horario: int, preco: float, base: Base_Dados) -> None:
+        try:
+            self.db.cadastrarEvento(nome ,local, horario,  preco, organizadora, id_usuario)
+            print("Usuário cadastrado com sucesso!")
+            return True
+        except Exception as e:
+            print(f"Erro ao cadastrar usuário: {e}")
+            return False
 
     def getNome(self):
         return super()._getNome()

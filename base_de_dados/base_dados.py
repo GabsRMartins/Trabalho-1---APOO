@@ -85,6 +85,16 @@ class Base_Dados:
             print(f"Erro ao cadastrar usuário: {e}")
             return False
 
+    def cadastrarEvento(self, nome, local, horario,  preco, organizadora, id_usuario)-> None:
+        cursor =  self.connection.cursor()
+        try:
+            cursor.execute(""" INSERT INTO eventos ( nome,local,horario,organizadora,preco,id_usuario
+                ) VALUES (?,?,?,?,?,?)""", (nome, local, horario,  oranizadora, preco, id_usuario))
+            self.connection.commit()
+        except sqlite3.Error as e:
+            print(f"Erro ao cadastrar evento: {e}")
+
+
     def close(self)-> None:
         if self.connection:
             self.connection.close()

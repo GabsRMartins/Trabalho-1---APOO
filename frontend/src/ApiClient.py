@@ -6,7 +6,7 @@ from Interface.UsuarioInterface import UsuarioInterface
 
 class ApiClient:
     def __init__(self):
-        self.base_url = "http://localhost:8000"
+        self.base_url = "http://localhost:5000"
         self.token = None 
 
     def _get_headers(self):
