@@ -1,5 +1,5 @@
-from ..entity.Usuario import Usuario
-from ....base_de_dados.base_dados import Base_Dados
+from entity.Usuario import Usuario
+from base_de_dados.base_dados import Base_Dados
 
 class UsuarioService(Usuario):
 
@@ -35,6 +35,9 @@ class UsuarioService(Usuario):
     def getSenha(self) -> str:
         return self.usuario._getSenha()
     
+    def getEmail(self) -> str:
+        return self.usuario._getEmail()
+
     def getTipo(self):
         return self.usuario._getTipo()
 

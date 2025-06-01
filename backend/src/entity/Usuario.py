@@ -11,7 +11,7 @@ class Usuario:
         self.__email = email
         self.__senha = senha
         self.__tipo = self._converterTipo(tipo)
-        self._idTipo = tipo
+        self.idTipo = tipo
 
     def _converterTipo(self, tipo_codigo: int) -> tipoUsuario:
         if tipo_codigo == 1:

@@ -1,5 +1,5 @@
-from ..entity.Evento import Evento
-from ....base_de_dados.base_dados import Base_Dados
+from entity.Evento import Evento
+from base_de_dados.base_dados import Base_Dados
 from typing import List
 
 class EventoService(Evento):

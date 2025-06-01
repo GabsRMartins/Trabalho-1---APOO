@@ -90,12 +90,17 @@ def usuario_logado():
     db = Base_Dados()
     db.connect()
     usuario_id = get_jwt_identity()
-    usuario_service = UsuarioService()
+    usuario_service = UsuarioService(None)
     usuario = usuario_service.buscarUsuarioId(usuario_id,db)
     if usuario:
+        
+        usuario_service.usuario = usuario
+        nome = usuario_service.getNome()
+        email = usuario_service.getEmail()
+
         return jsonify({
-            "nome": usuario.nome,
-            "email": usuario.email,
+            "nome": nome,
+            "email": email,
             "tipo":usuario.idTipo
         })
     else:
@@ -109,7 +114,7 @@ def usuario_logado():
 def pegarEventos():
     db = Base_Dados()
     db.connect()
-    evento_service = EventoService()
+    evento_service = EventoService(None)
     eventos = evento_service.obterEventos(db)
     eventos_dict = [evento.to_dict() for evento in eventos]
     return jsonify(eventos_dict)                                     

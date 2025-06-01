@@ -16,11 +16,11 @@ class Evento(Entidade):
     def to_dict(self):
         return {
             "id": self.id,
-            "nome": self.nome,
-            "local": self.local,
-            "horario": self.horario,
+            "nome": self.__nome,
+            "local": self.__local,
+            "horario": self.__horario,
             "organizadora": self.organizadora,
-            "preco": self.preco,
+            "preco": self.__preco,
             "usuario": self.__usuario,
             "criado_em": self.criado_em
         }
@@ -62,5 +62,5 @@ class Evento(Entidade):
         self.__usuario = usuario
 
     def print(self):
-        print(self.nome)    
+        print(self.__nome)    
 

@@ -1,7 +1,7 @@
-from ..entity.Promotor import Promotor
-from ..entity.Mapa import Mapa
+from entity.Promotor import Promotor
+from entity.Mapa import Mapa
 from service import EventoService
-from ..entity.Evento import Evento
+from entity.Evento import Evento
 from typing import List
 
 class PromotorService(Promotor):
