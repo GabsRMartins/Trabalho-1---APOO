@@ -25,6 +25,7 @@ class EventoService(Evento):
         eventos = [
             Evento(*tupla) for tupla in lista_eventos_tuplas
         ]
+        print(eventos)
         return eventos
      except Exception as e:
         print(f"Erro ao obter lista de eventos: {e}")

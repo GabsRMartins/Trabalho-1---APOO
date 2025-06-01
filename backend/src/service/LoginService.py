@@ -23,9 +23,13 @@ class LoginService:
 
     def cadastrar(self, username, email, password, tipo):
         try:
-            self.db.cadastrar(username ,email, password,  tipo)
-            print("Usuário cadastrado com sucesso!")
-            return True
+            cadastro = self.db.cadastrar(username ,email, password,  tipo)
+            if(cadastro == True):
+             print("Usuário cadastrado com sucesso!")
+             return True
+            else:
+                print(f"Erro ao cadastrar usuário")
+                return False
         except Exception as e:
             print(f"Erro ao cadastrar usuário: {e}")
             return False

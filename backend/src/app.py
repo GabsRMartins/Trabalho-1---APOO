@@ -63,10 +63,10 @@ def cadastrar():
     login_service = LoginService(db)
     cadastro = login_service.cadastrar(username,email,password,tipo)
     db.close()
-    if cadastro:
+    if (cadastro == True):
         return jsonify({'message': 'Cadastro efetuado com sucesso'}), 200
     else:
-        return jsonify({'error': 'Erro ao realizar cadastro'}), 401
+        return jsonify({'error': 'Erro ao realizar cadastro'}), 400
 
 
 blacklist = set()
