@@ -3,8 +3,9 @@ from base_de_dados.base_dados import Base_Dados
 
 class LocalService(Local):
 
-    def __init__(self):
-        pass
+    def __init__(self, local: Local):
+        self.local = local
+        
 
     def buscarLocal(self, base: Base_Dados) -> Local:
         try:
@@ -18,37 +19,37 @@ class LocalService(Local):
             return None
         
     def getNome(self) -> str:
-        return super()._getNome()
+        return self.local._getNome()
     
     def getRua(self) -> str:
-        return super()._getRua()
+        return self.local._getRua()
     
     def getBairro(self) -> str:
-        return super()._getBairro()
+        return self.local._getBairro()
     
     def getCep(self) -> str:
-        return super()._getCep()
+        return self.local._getCep()
     
     def getHorarioFuncionamento(self) -> str:
-        return super()._getHorarioFuncionamento()
+        return self.local._getHorarioFuncionamento()
     
     def getMaxPessoas(self) -> int:
-        return super()._getMaxPessoas()
+        return self.local._getMaxPessoas()
     
     def setNome(self, nome: str) -> None:
-        super()._setNome(nome)
+        self.local._setNome(nome)
 
     def setRua(self, rua: str) -> None:
-        super()._setRua(rua)
+        self.local._setRua(rua)
     
     def setBairro(self, bairro: str) -> None:
-        super()._setBairro(bairro)
+        self.local._setBairro(bairro)
     
     def setCep(self, cep: str) -> None:
-        super()._setCep(cep)
+        self.local._setCep(cep)
     
     def setHorarioFuncionamento(self, horarioFuncionamento: str) -> None:
-        super()._setHorarioFuncionamento(horarioFuncionamento)
+        self.local._setHorarioFuncionamento(horarioFuncionamento)
     
     def setMaxPessoas(self, maxPessoas: int) -> None:
-        super()._setMaxPessoas(maxPessoas)
+        self.local._setMaxPessoas(maxPessoas)
