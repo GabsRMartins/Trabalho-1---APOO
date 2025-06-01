@@ -72,7 +72,7 @@ class Base_Dados:
             print(f"Erro ao obter credenciais: {e}")
             return []
             
-    def cadastrar(self, username, email, password,  tipo)-> None:
+    def cadastrar(self, username, email, password,  tipo)-> bool:
         cursor =  self.connection.cursor()
         try:
             cursor.execute("""
@@ -80,8 +80,10 @@ class Base_Dados:
             VALUES (?, ?, ?, ?)
             """, (username, email, password,  tipo))
             self.connection.commit()
+            return True
         except sqlite3.Error as e:
             print(f"Erro ao cadastrar usuário: {e}")
+            return False
 
     def close(self)-> None:
         if self.connection:
@@ -92,7 +94,15 @@ class Base_Dados:
         cursor =  self.connection.cursor()
         try:
             cursor.execute("SELECT * FROM eventos ")
-            return cursor.fetchall()
+
+            eventos = cursor.fetchall()
+            # Adiciona o print para debug
+            print("\nResultado da consulta de eventos:")
+            for evento in eventos:
+                print(evento)
+            print(f"Total de eventos encontrados: {len(eventos)}\n")    
+
+            return eventos
         except sqlite3.Error as e:
             print(f"Erro ao consultar eventos: {e}")
             return []
