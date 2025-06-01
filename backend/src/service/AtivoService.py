@@ -1,6 +1,6 @@
-from ..entity.Ativo import Ativo
-from ..entity.Evento import Evento
-from ..entity.Mapa import Mapa
+from entity.Ativo import Ativo
+from entity.Evento import Evento
+from entity.Mapa import Mapa
 from typing import List
 
 class AtivoService(Ativo):
