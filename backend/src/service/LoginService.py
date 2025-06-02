@@ -1,4 +1,4 @@
-from ....base_de_dados.base_dados import Base_Dados
+from base_de_dados.base_dados import Base_Dados
 
 class LoginService:
     def __init__(self, db: Base_Dados):
@@ -23,9 +23,13 @@ class LoginService:
 
     def cadastrar(self, username: str, email: str, password: str, tipo: int) -> bool:
         try:
-            self.db.cadastrar(username ,email, password,  tipo)
-            print("Usuário cadastrado com sucesso!")
-            return True
+            cadastro = self.db.cadastrar(username ,email, password,  tipo)
+            if(cadastro == True):
+             print("Usuário cadastrado com sucesso!")
+             return True
+            else:
+                print(f"Erro ao cadastrar usuário")
+                return False
         except Exception as e:
             print(f"Erro ao cadastrar usuário: {e}")
             return False

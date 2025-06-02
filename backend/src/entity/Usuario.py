@@ -7,8 +7,8 @@ class tipoUsuario(Enum):
 
 class Usuario:
     def __init__(self, nome:str, senha:str, email:str ,tipo:tipoUsuario):
-        self.nome = nome
-        self.email = email
+        self.__nome = nome
+        self.__email = email
         self.__senha = senha
         self.__tipo = self._converterTipo(tipo)
         self.idTipo = tipo
@@ -22,20 +22,24 @@ class Usuario:
             raise ValueError(f"Código de tipo de usuário inválido: {tipo_codigo}")
 
     def _getNome(self) -> str:
-        return self.nome
+        return self.__nome
 
     def _getSenha(self) -> str:
         return self.__senha
     
-    def _setNome(self, nome ):
-        self.nome = nome   
-
+    def _getEmail(self) -> str:
+        return self.__email
+    
     def _getTipo(self):
         return self.__tipo
+    
+    def _setNome(self, nome: str):
+        self.__nome = nome   
 
-# Depois substituir por um método de cryptografar 
-    def _setSenha(self, senha):
-        self.__senha = senha   
+    # Depois substituir por um método de cryptografar 
+    def _setSenha(self, senha: str):
+        self.__senha = senha
+    
+    def _setEmail(self, email: str):
+        self.__email = email
 
-    def getTipo(self):
-        return self.__tipo    

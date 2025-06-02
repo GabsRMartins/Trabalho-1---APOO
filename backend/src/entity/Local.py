@@ -1,4 +1,4 @@
-from entity.Entidade import Entidade
+from .Entidade import Entidade
 
 class Local(Entidade):
     

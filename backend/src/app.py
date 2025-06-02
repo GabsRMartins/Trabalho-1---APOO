@@ -10,6 +10,7 @@ from base_de_dados.base_dados import Base_Dados
 from service.LoginService import LoginService
 from service.UsuarioService import UsuarioService
 from service.EventoService import EventoService
+from entity.Evento import Evento
 
 app = Flask(__name__)
 app.config["JWT_SECRET_KEY"] = "ACSACASSA"
@@ -63,10 +64,10 @@ def cadastrar():
     login_service = LoginService(db)
     cadastro = login_service.cadastrar(username,email,password,tipo)
     db.close()
-    if cadastro:
+    if (cadastro == True):
         return jsonify({'message': 'Cadastro efetuado com sucesso'}), 200
     else:
-        return jsonify({'error': 'Erro ao realizar cadastro'}), 401
+        return jsonify({'error': 'Erro ao realizar cadastro'}), 400
 
 
 blacklist = set()
@@ -90,12 +91,17 @@ def usuario_logado():
     db = Base_Dados()
     db.connect()
     usuario_id = get_jwt_identity()
-    usuario_service = UsuarioService()
+    usuario_service = UsuarioService(None)
     usuario = usuario_service.buscarUsuarioId(usuario_id,db)
     if usuario:
+        
+        usuario_service.usuario = usuario
+        nome = usuario_service.getNome()
+        email = usuario_service.getEmail()
+
         return jsonify({
-            "nome": usuario.nome,
-            "email": usuario.email,
+            "nome": nome,
+            "email": email,
             "tipo":usuario.idTipo
         })
     else:
@@ -109,11 +115,46 @@ def usuario_logado():
 def pegarEventos():
     db = Base_Dados()
     db.connect()
-    evento_service = EventoService()
+    evento_service = EventoService(None)
     eventos = evento_service.obterEventos(db)
     eventos_dict = [evento.to_dict() for evento in eventos]
     return jsonify(eventos_dict)                                     
 
+@app.route('/eventos/<string:nome>', methods=['GET'])
+@jwt_required()
+def obter_evento_nome(nome):
+    db = Base_Dados()
+    db.connect()
+    evento_service = EventoService(None)
+    
+    eventos = evento_service.obterEventosNome(db, nome)
+    eventos_dict = [evento.to_dict() for evento in eventos]
+    
+    return jsonify(eventos_dict)   
+
+
+
+@app.route('/eventos',methods=['POST'])
+@jwt_required()
+def cadastrarEvento():
+    data = request.get_json()  
+    nome = data.get('nome')
+    horario = data.get('horario')
+    local = data.get('local')
+    preco = data.get('preco')
+    organizadora = data.get('organizadora')
+    usuario = data.get('usuario_id')
+    if not nome or not horario or not local or not preco or not organizadora:
+        return jsonify({'error': 'Todos os campos são obrigatórios'}), 400
+    db = Base_Dados()
+    db.connect()
+    evento_service = EventoService(None)
+    cadastro = evento_service.cadastraEvento(nome,local,horario,organizadora,preco,usuario,db)
+    db.close()
+    if (cadastro == True):
+        return jsonify({'message': 'Cadastro efetuado com sucesso'}), 200
+    else:
+        return jsonify({'error': 'Erro ao realizar cadastro'}), 400
 
 
 if __name__ == '__main__':

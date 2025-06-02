@@ -1,11 +1,10 @@
 import tkinter as tk
-from tkinter import ttk, messagebox
-from TelaInicial import HomePage
+from tkinter import ttk
 from PIL import Image, ImageTk
-from ApiClient import ApiClient
-from Components.logout_button import LogoutButton
 import customtkinter as ctk
 from Components.detalhes_evento_frame import DetalhesEventoFrame
+from Components.menu_lateral import MenuLateralFrame
+from Components.lista_frame import ListaFrame
 from Utils.validador import Validador
 
 
@@ -24,49 +23,54 @@ class EventPage(tk.Frame):
         self.controller = controller
         self.api_client = controller.api_client
         self.validador = Validador()
+        self.menu_lateral = None
         self.usuarioLogado = None 
         self.carregado = False
         self.eventos_originais = self.api_client.getEventos()
         self.eventos_filtrados = list(self.eventos_originais)  
-        self.eventos_escolhidos = set()  # Armazena índices dos eventos escolhidos
-
+        self.estado_favoritos = {}
+        self.estado_adicionados = {}
 
         self.frame = tk.Frame(self, bg=self.form_bg, padx=20, pady=20)
         self.frame.place(relx=0.5, rely=0.5, anchor="center")
 
+        imagem_frame = ctk.CTkFrame(self.frame, fg_color="transparent")
+        imagem_frame.pack(fill="x", pady=(10, 0))
+
+        self.slogan = ctk.CTkImage(light_image=Image.open("../assets/TelaEventos.png"), size=(200, 200))
+        ctk.CTkLabel(imagem_frame, image=self.slogan, text="").pack()
+
+        self.controller.estado_favoritos = self.filtrar_eventos_curtidos(self.eventos_originais,self.estado_favoritos)
         self.header_frame = tk.Frame(self.frame, bg=self.form_bg)
         self.header_frame.pack(fill="x", pady=(0,10))
-
-        LogoutButton(self.header_frame, self.api_client, self.controller)
-     
-        # Botão para ver eventos escolhidos
-        self.ver_eventos_button = tk.Button(
-            self.header_frame,
-            text="Ver Meus Eventos",
-            font=('Arial', 10, 'bold'),
-            bg="#43A047",
-            fg="white",
-            command=self.mostrar_eventos_escolhidos
+        controller.estado_favoritos = self.filtrar_eventos_curtidos(self.eventos_originais,self.estado_favoritos)
+        self.botao_verLista = ctk.CTkButton( self.header_frame, 
+           text="Imprimir Lista UAI", width=30, height=30,
+           command=self.verLista,
+            fg_color="#E53935",
+            text_color="white",
+            font=('Arial', 22, 'bold'),
+            corner_radius=20,
+            compound="left"
         )
-        self.ver_eventos_button.pack(side="right", padx=15, pady=10)
+        self.botao_verLista.pack(side="right", padx=(0, 5))
 
+        # Abrir e redimensionar a imagem
+        img = Image.open("../assets/botao_capivara.png")
+        img = img.resize((60, 60), Image.Resampling.LANCZOS) 
+        img_tk = ImageTk.PhotoImage(img)
+
+        # Criar o botão com imagem
+        self.menu_button = tk.Button(
+            self, image=img_tk, bg="#E3F2FD", bd=0, command=self.toggle_menu_lateral
+        )
+        self.menu_button.image = img_tk  
+        self.menu_button.place(x=10, y=10)
+
+        
         self._criar_interface_filtro()
         self._criar_tabela()
         self._atualizar_tabela()
-
-    def on_show(self):
-        self.usuarioLogado = self.api_client.getDadosLogado()
-        if hasattr(self, 'bem_vindo_label'):
-            self.bem_vindo_label.configure(text=f"Bem vindo(a), {self.usuarioLogado.nome}")
-        else:
-            self.bem_vindo_label = ctk.CTkLabel(
-                self.header_frame,
-                text=f"Bem vindo(a), {self.usuarioLogado.nome}",
-                font=('Arial', 30, 'bold'),
-                text_color="#333333",
-                anchor="w"
-            )
-            self.bem_vindo_label.pack(side="left", padx=15, pady=10)
 
    
 
@@ -76,7 +80,7 @@ class EventPage(tk.Frame):
         filtro_frame = ctk.CTkFrame(self.frame, corner_radius=10, fg_color="#E3F2FD")
         filtro_frame.pack(pady=(0, 10), padx=10, fill="x")
 
-        titulo = ctk.CTkLabel(filtro_frame, text="🎯 Filtrar Eventos", font=("Arial", 16, "bold"), text_color="#0D47A1")
+        titulo = ctk.CTkLabel(filtro_frame, text="🎯 Achar seu Rolê", font=("Arial", 16, "bold"), text_color="#0D47A1")
         titulo.grid(row=0, column=0, columnspan=9, pady=(10, 10), sticky="w", padx=10)
 
         # Variáveis
@@ -104,13 +108,15 @@ class EventPage(tk.Frame):
                 entry.configure(validate="key", validatecommand=(val_cmd, "%P"))
             entry.grid(row=1, column=i*2+1, padx=5, pady=5)
 
-        entry_horario = ctk.CTkEntry(filtro_frame, textvariable=self.horario_filtro, width=150)
-        entry_horario.grid(row=1, column=3, padx=5, pady=5)
-        entry_horario.bind("<KeyRelease>", lambda e: self.mascarar_horario_valido(self.horario_filtro)) 
+        self.entry_horario_var = ctk.StringVar()
+        entry_horario = ctk.CTkEntry(filtro_frame, textvariable=self.entry_horario_var, width=150)
+        entry_horario.grid(row=1, column=3, padx=5, pady=5) 
+        self.entry_horario_var.trace_add("write", lambda *args: Validador.horario_valido(self.entry_horario_var))
 
-        entry_preco = ctk.CTkEntry(filtro_frame, textvariable=self.preco_filtro, width=150)
+        self.entry_preco_var = ctk.StringVar()
+        entry_preco = ctk.CTkEntry(filtro_frame, textvariable=self.entry_preco_var, width=150)
         entry_preco.grid(row=1, column=7, padx=5, pady=5)
-        entry_preco.bind("<KeyRelease>", lambda e: self.mascarar_preco_valido(self.preco_filtro))
+        self.entry_preco_var.trace_add("write", lambda *args: Validador.preco_valido(self.entry_preco_var))
                 
 
         ctk.CTkButton(
@@ -123,70 +129,31 @@ class EventPage(tk.Frame):
             fg_color="#F44336", hover_color="#D32F2F", text_color="white", width=150
         ).grid(row=2, column=0, columnspan=9, pady=10)
 
-
-    def mascarar_horario_valido(self,var: ctk.StringVar):
-        valor = var.get()
-        apenas_digitos = ''.join(filter(str.isdigit, valor))[:4]  # pega só os primeiros 4 dígitos
-
-        if len(apenas_digitos) == 0:
-            resultado = ""
-        elif len(apenas_digitos) == 1:
-            # Aceita 0 a 2 no primeiro dígito
-            if apenas_digitos[0] > '2':
-                resultado = "2"
-            else:
-                resultado = apenas_digitos
-        elif len(apenas_digitos) == 2:
-            # Valida as horas de 00 a 23
-            horas = int(apenas_digitos)
-            if horas > 23:
-                resultado = "23"
-            else:
-                resultado = f"{horas:02d}"
-        elif len(apenas_digitos) == 3:
-            # Formato: HH:M, minuto incompleto, completa com 0
-            horas = int(apenas_digitos[:2])
-            minutos_1 = int(apenas_digitos[2])
-            if horas > 23:
-                horas = 23
-            if minutos_1 > 5:  # minutos não podem começar com >5
-                minutos_1 = 5
-            resultado = f"{horas:02d}:{minutos_1}0"
-        else:  # 4 dígitos completos HHMM
-            horas = int(apenas_digitos[:2])
-            minutos = int(apenas_digitos[2:])
-            if horas > 23:
-                horas = 23
-            if minutos > 59:
-                minutos = 59
-            resultado = f"{horas:02d}:{minutos:02d}"
-
-        var.set(resultado)
-
-    def mascarar_preco_valido(self,var: ctk.StringVar):
-        valor = var.get()
-
-        # Remove caracteres inválidos (só números e vírgula ou ponto)
-        valor = valor.replace(",", ".")  # aceita vírgula como ponto
-        permitido = ''.join(c for c in valor if c.isdigit() or c == '.')
-
-        # Divide em parte inteira e decimal
-        if '.' in permitido:
-            partes = permitido.split('.', 1)
-            inteiro = partes[0]
-            decimal = partes[1][:2]  # apenas 2 casas decimais
-            resultado = f"{inteiro}.{decimal}"
+        
+    def toggle_menu_lateral(self):
+        if self.menu_lateral and self.menu_lateral.winfo_ismapped():
+            self.menu_lateral.place_forget()
         else:
-            resultado = permitido
+            # Sempre cria uma nova instância com dados atualizados
+            if self.menu_lateral:
+                self.menu_lateral.destroy()
 
-        var.set(resultado)
+            self.menu_lateral = MenuLateralFrame(self, fechar_callback=self.fechar_menu_lateral)
+            self.menu_lateral.place(x=0, y=0, relheight=1)
 
+            
+    def fechar_menu_lateral(self):
+        if self.menu_lateral:
+            self.menu_lateral.place_forget()
+
+
+   
 
 
     def _criar_tabela(self):
         self.titulo_tabela = ctk.CTkLabel(
             self.frame,
-            text="📋 Lista de Eventos",
+            text="📋 Rolês de Hoje",
             font=('Arial', 20, 'bold'),
             text_color="#333333"
         )
@@ -221,7 +188,7 @@ class EventPage(tk.Frame):
 
         for idx, evento in enumerate(self.eventos_filtrados):
             evento_id = (evento.nome, evento.horario, evento.local, evento.preco)
-            selecionado = "✔" if evento_id in self.eventos_escolhidos else ""
+            selecionado = " "
             self.tree.insert("", tk.END, iid=idx, values=(selecionado, evento.nome, evento.horario, evento.local, f"R$ {evento.preco:.2f}"))
 
 
@@ -232,11 +199,35 @@ class EventPage(tk.Frame):
 
         idx = int(selected_item[0])
         evento = self.eventos_filtrados[idx]
+        evento_id = evento.nome  # ou evento.id, se tiver
 
+        # Inicialize dicionários se não existirem
+        if not hasattr(self, "estado_favoritos"):
+            self.estado_favoritos = {}
+        if not hasattr(self, "estado_adicionados"):
+            self.estado_adicionados = {}
+
+        # Recupera estado salvo ou False
+        favoritado = self.estado_favoritos.get(evento_id, False)
+        adicionado = self.estado_adicionados.get(evento_id, False)
+
+        self.controller.estado_favoritos = self.filtrar_eventos_curtidos(self.eventos_originais,self.estado_favoritos)
+        
+        # Remove painel anterior se existir
         if hasattr(self, "painel_detalhes") and self.painel_detalhes.winfo_exists():
             self.painel_detalhes.destroy()
 
-        self.painel_detalhes = DetalhesEventoFrame(self, evento, self.define_foto_nome)
+        # Cria novo painel com os estados e funções de salvamento
+        self.painel_detalhes = DetalhesEventoFrame(
+            self,
+            evento,
+            self.define_foto_nome,
+            favoritado=favoritado,
+            adicionado=adicionado,
+            salvar_favorito=lambda estado: self.estado_favoritos.update({evento_id: estado}),
+            salvar_adicionado=lambda estado: self.estado_adicionados.update({evento_id: estado})
+        )
+
 
 
     def define_foto_nome(self, nome):
@@ -256,23 +247,12 @@ class EventPage(tk.Frame):
 
      return fotos.get(nome, "../assets/default.png")
     
-    def mostrar_eventos_escolhidos(self):
-        if not self.eventos_escolhidos:
-            messagebox.showinfo("Meus Eventos", "Nenhum evento selecionado.")
-            return
-        eventos = []
-        for evento in self.eventos_originais:
-            evento_id = (evento.nome, evento.horario, evento.local, evento.preco)
-            if evento_id in self.eventos_escolhidos:
-                eventos.append(evento)
-        texto = "\n".join([f"{e.nome} - {e.horario} - {e.local} - R$ {e.preco:.2f}" for e in eventos])
-        messagebox.showinfo("Meus Eventos", texto)
 
     def _aplicar_filtro(self):
         nome_digitado = self.nome_filtro.get().lower()
-        horario_digitado = self.horario_filtro.get()
+        horario_digitado = self.entry_horario_var.get()
         local_digitado = self.local_filtro.get().lower()
-        preco_max_str = self.preco_filtro.get().replace(",", ".")
+        preco_max_str = self.entry_preco_var.get().replace(",", ".")
         preco_max = float('inf')
         if preco_max_str:
             try:
@@ -302,10 +282,20 @@ class EventPage(tk.Frame):
         self._atualizar_tabela()
 
 
-    # Essa função é apenas para simular a inserção de eventos. Usuários ativos não criam novos eventos.
-    def inserir_evento(self, evento):
-        self.eventos_originais.append(evento)
-        self.eventos_filtrados.append(evento)
-        self._atualizar_tabela()
-
+    def verLista(self):
+        if hasattr(self, 'lista_frame') and self.lista_frame.winfo_exists():
+            self.lista_frame.destroy()
+        eventos = self.filtrar_eventos_adicionados(self.eventos_originais,self.estado_adicionados)
+        self.lista_frame = ListaFrame(self, eventos, fechar_callback=self.fechar_lista)
+        self.lista_frame.pack(fill="both", expand=True, padx=20, pady=10)
   
+    def filtrar_eventos_adicionados(self, eventos_originais, eventos_adicionados):
+        return [evento for evento in eventos_originais if eventos_adicionados.get(evento.nome)]
+    
+    def filtrar_eventos_curtidos(self, eventos_originais, eventos_curtidos):
+        return [evento for evento in eventos_originais if eventos_curtidos.get(evento.nome)]
+     
+     
+    def fechar_lista(self):
+        if self.lista_frame:
+            self.lista_frame.place_forget()

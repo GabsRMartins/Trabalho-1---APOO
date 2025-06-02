@@ -34,14 +34,15 @@ class Base_Dados:
         except sqlite3.Error as e:
             print(f"Erro ao adicionar usuário: {e}")
 
-    def add_evento(self, nome_evento:str, local_evento:str, organizadora:str, id_usuario:str)-> str:
+    def add_evento(self, nome_evento:str, local_evento:str,horario:str, organizadora:str, preco:int, id_usuario:int)-> str:
         cursor =  self.connection.cursor()
         try:
             cursor.execute("""
-            INSERT INTO eventos (nome_evento, local_evento, organizadora, id_usuario) 
-            VALUES (?, ?, ?, ?)
-            """, (nome_evento, local_evento, organizadora, id_usuario))
+            INSERT INTO eventos (nome_evento, local_evento,horario, organizadora,preco, id_usuario) 
+            VALUES (?, ?, ?, ?, ?, ?)
+            """, (nome_evento, local_evento, horario ,organizadora,preco, id_usuario))
             self.connection.commit()
+            return True
         except sqlite3.Error as e:
             print(f"Erro ao adicionar evento: {e}")
 
@@ -72,7 +73,7 @@ class Base_Dados:
             print(f"Erro ao obter credenciais: {e}")
             return []
             
-    def cadastrar(self, username, email, password,  tipo)-> None:
+    def cadastrar(self, username, email, password,  tipo)-> bool:
         cursor =  self.connection.cursor()
         try:
             cursor.execute("""
@@ -80,8 +81,10 @@ class Base_Dados:
             VALUES (?, ?, ?, ?)
             """, (username, email, password,  tipo))
             self.connection.commit()
+            return True
         except sqlite3.Error as e:
             print(f"Erro ao cadastrar usuário: {e}")
+            return False
 
     def close(self)-> None:
         if self.connection:
@@ -92,7 +95,32 @@ class Base_Dados:
         cursor =  self.connection.cursor()
         try:
             cursor.execute("SELECT * FROM eventos ")
-            return cursor.fetchall()
+
+            eventos = cursor.fetchall()
+            # Adiciona o print para debug
+            print("\nResultado da consulta de eventos:")
+            for evento in eventos:
+                print(evento)
+            print(f"Total de eventos encontrados: {len(eventos)}\n")    
+
+            return eventos
         except sqlite3.Error as e:
             print(f"Erro ao consultar eventos: {e}")
             return []
+        
+    def get_evento_nome(self,nome):
+        cursor =  self.connection.cursor()
+        try:
+            cursor.execute("SELECT * FROM eventos WHERE organizadora = ?", (nome,))
+
+            eventos = cursor.fetchall()
+            # Adiciona o print para debug
+            print("\nResultado da consulta de eventos:")
+            for evento in eventos:
+                print(evento)
+            print(f"Total de eventos encontrados: {len(eventos)}\n")    
+
+            return eventos
+        except sqlite3.Error as e:
+            print(f"Erro ao consultar eventos: {e}")
+            return [] 

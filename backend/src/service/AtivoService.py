@@ -1,32 +1,32 @@
-from entity import Ativo
+from entity.Ativo import Ativo
 from entity.Evento import Evento
 from entity.Mapa import Mapa
 from typing import List
 
 class AtivoService(Ativo):
 
-    def __init__(self):
-        pass
-    
+    def __init__(self, ativo: Ativo):
+        self.ativo = ativo
+        
     def acessarMapa(self, mapa: Mapa) -> Mapa:
-        return super()._acessarMapa(mapa)
+        return self.ativo._acessarMapa(mapa)
     
     def acessarEventos(self, evento: Evento):
-        return super()._selecionaEventos(evento)
+        return self.ativo._selecionaEventos(evento)
     
     def retornaEventos(self,) -> List[Evento]:
-        return super()._retornaEventos()
+        return self.ativo._retornaEventos()
     
     def removerEventos(self, evento: Evento):
-        return super()._removerEventos(evento)
+        return self.ativo._removerEventos(evento)
 
 if __name__ == "__main__":
 
     from ..entity.Local import Local
 
-    usuario1 = Ativo("João", "ABC1234")
+    usuario1 = Ativo("João", "ABC1234", "joao@gmail.com")
 
-    atvService = AtivoService()
+    atvService = AtivoService(usuario1)
 
     mapa = Mapa() 
 
