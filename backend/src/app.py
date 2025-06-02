@@ -125,7 +125,7 @@ def pegarEventos():
 def obter_evento_nome(nome):
     db = Base_Dados()
     db.connect()
-    evento_service = EventoService()
+    evento_service = EventoService(None)
     
     eventos = evento_service.obterEventosNome(db, nome)
     eventos_dict = [evento.to_dict() for evento in eventos]
@@ -148,7 +148,7 @@ def cadastrarEvento():
         return jsonify({'error': 'Todos os campos são obrigatórios'}), 400
     db = Base_Dados()
     db.connect()
-    evento_service = EventoService()
+    evento_service = EventoService(None)
     cadastro = evento_service.cadastraEvento(nome,local,horario,organizadora,preco,usuario,db)
     db.close()
     if (cadastro == True):
