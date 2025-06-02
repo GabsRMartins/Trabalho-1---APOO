@@ -39,11 +39,11 @@ class EventPage(tk.Frame):
 
         self.slogan = ctk.CTkImage(light_image=Image.open("../assets/TelaEventos.png"), size=(200, 200))
         ctk.CTkLabel(imagem_frame, image=self.slogan, text="").pack()
-    
 
+        self.controller.estado_favoritos = self.filtrar_eventos_curtidos(self.eventos_originais,self.estado_favoritos)
         self.header_frame = tk.Frame(self.frame, bg=self.form_bg)
         self.header_frame.pack(fill="x", pady=(0,10))
-
+        controller.estado_favoritos = self.filtrar_eventos_curtidos(self.eventos_originais,self.estado_favoritos)
         self.botao_verLista = ctk.CTkButton( self.header_frame, 
            text="Imprimir Lista UAI", width=30, height=30,
            command=self.verLista,
@@ -67,7 +67,7 @@ class EventPage(tk.Frame):
         self.menu_button.image = img_tk  
         self.menu_button.place(x=10, y=10)
 
-
+        
         self._criar_interface_filtro()
         self._criar_tabela()
         self._atualizar_tabela()
@@ -108,13 +108,15 @@ class EventPage(tk.Frame):
                 entry.configure(validate="key", validatecommand=(val_cmd, "%P"))
             entry.grid(row=1, column=i*2+1, padx=5, pady=5)
 
-        entry_horario = ctk.CTkEntry(filtro_frame, textvariable=self.horario_filtro, width=150)
-        entry_horario.grid(row=1, column=3, padx=5, pady=5)
-        entry_horario.bind("<KeyRelease>", lambda e: self.mascarar_horario_valido(self.horario_filtro)) 
+        self.entry_horario_var = ctk.StringVar()
+        entry_horario = ctk.CTkEntry(filtro_frame, textvariable=self.entry_horario_var, width=150)
+        entry_horario.grid(row=1, column=3, padx=5, pady=5) 
+        self.entry_horario_var.trace_add("write", lambda *args: Validador.horario_valido(self.entry_horario_var))
 
-        entry_preco = ctk.CTkEntry(filtro_frame, textvariable=self.preco_filtro, width=150)
+        self.entry_preco_var = ctk.StringVar()
+        entry_preco = ctk.CTkEntry(filtro_frame, textvariable=self.entry_preco_var, width=150)
         entry_preco.grid(row=1, column=7, padx=5, pady=5)
-        entry_preco.bind("<KeyRelease>", lambda e: self.mascarar_preco_valido(self.preco_filtro))
+        self.entry_preco_var.trace_add("write", lambda *args: Validador.preco_valido(self.entry_preco_var))
                 
 
         ctk.CTkButton(
@@ -132,72 +134,20 @@ class EventPage(tk.Frame):
         if self.menu_lateral and self.menu_lateral.winfo_ismapped():
             self.menu_lateral.place_forget()
         else:
-            if not self.menu_lateral:
-                self.menu_lateral = MenuLateralFrame(self, fechar_callback=self.fechar_menu_lateral)
+            # Sempre cria uma nova instância com dados atualizados
+            if self.menu_lateral:
+                self.menu_lateral.destroy()
+
+            self.menu_lateral = MenuLateralFrame(self, fechar_callback=self.fechar_menu_lateral)
             self.menu_lateral.place(x=0, y=0, relheight=1)
+
             
     def fechar_menu_lateral(self):
         if self.menu_lateral:
             self.menu_lateral.place_forget()
 
 
-    def mascarar_horario_valido(self,var: ctk.StringVar):
-        valor = var.get()
-        apenas_digitos = ''.join(filter(str.isdigit, valor))[:4]  # pega só os primeiros 4 dígitos
-
-        if len(apenas_digitos) == 0:
-            resultado = ""
-        elif len(apenas_digitos) == 1:
-            # Aceita 0 a 2 no primeiro dígito
-            if apenas_digitos[0] > '2':
-                resultado = "2"
-            else:
-                resultado = apenas_digitos
-        elif len(apenas_digitos) == 2:
-            # Valida as horas de 00 a 23
-            horas = int(apenas_digitos)
-            if horas > 23:
-                resultado = "23"
-            else:
-                resultado = f"{horas:02d}"
-        elif len(apenas_digitos) == 3:
-            # Formato: HH:M, minuto incompleto, completa com 0
-            horas = int(apenas_digitos[:2])
-            minutos_1 = int(apenas_digitos[2])
-            if horas > 23:
-                horas = 23
-            if minutos_1 > 5:  # minutos não podem começar com >5
-                minutos_1 = 5
-            resultado = f"{horas:02d}:{minutos_1}0"
-        else:  # 4 dígitos completos HHMM
-            horas = int(apenas_digitos[:2])
-            minutos = int(apenas_digitos[2:])
-            if horas > 23:
-                horas = 23
-            if minutos > 59:
-                minutos = 59
-            resultado = f"{horas:02d}:{minutos:02d}"
-
-        var.set(resultado)
-
-    def mascarar_preco_valido(self,var: ctk.StringVar):
-        valor = var.get()
-
-        # Remove caracteres inválidos (só números e vírgula ou ponto)
-        valor = valor.replace(",", ".")  # aceita vírgula como ponto
-        permitido = ''.join(c for c in valor if c.isdigit() or c == '.')
-
-        # Divide em parte inteira e decimal
-        if '.' in permitido:
-            partes = permitido.split('.', 1)
-            inteiro = partes[0]
-            decimal = partes[1][:2]  # apenas 2 casas decimais
-            resultado = f"{inteiro}.{decimal}"
-        else:
-            resultado = permitido
-
-        var.set(resultado)
-
+   
 
 
     def _criar_tabela(self):
@@ -261,9 +211,8 @@ class EventPage(tk.Frame):
         favoritado = self.estado_favoritos.get(evento_id, False)
         adicionado = self.estado_adicionados.get(evento_id, False)
 
-        print(self.estado_favoritos)
-        print(self.estado_adicionados)
-
+        self.controller.estado_favoritos = self.filtrar_eventos_curtidos(self.eventos_originais,self.estado_favoritos)
+        
         # Remove painel anterior se existir
         if hasattr(self, "painel_detalhes") and self.painel_detalhes.winfo_exists():
             self.painel_detalhes.destroy()
@@ -301,9 +250,9 @@ class EventPage(tk.Frame):
 
     def _aplicar_filtro(self):
         nome_digitado = self.nome_filtro.get().lower()
-        horario_digitado = self.horario_filtro.get()
+        horario_digitado = self.entry_horario_var.get()
         local_digitado = self.local_filtro.get().lower()
-        preco_max_str = self.preco_filtro.get().replace(",", ".")
+        preco_max_str = self.entry_preco_var.get().replace(",", ".")
         preco_max = float('inf')
         if preco_max_str:
             try:
@@ -342,6 +291,10 @@ class EventPage(tk.Frame):
   
     def filtrar_eventos_adicionados(self, eventos_originais, eventos_adicionados):
         return [evento for evento in eventos_originais if eventos_adicionados.get(evento.nome)]
+    
+    def filtrar_eventos_curtidos(self, eventos_originais, eventos_curtidos):
+        return [evento for evento in eventos_originais if eventos_curtidos.get(evento.nome)]
+     
      
     def fechar_lista(self):
         if self.lista_frame:

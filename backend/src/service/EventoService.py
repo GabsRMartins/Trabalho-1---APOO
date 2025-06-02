@@ -28,11 +28,35 @@ class EventoService(Evento):
         eventos = [
             Evento(*tupla) for tupla in lista_eventos_tuplas
         ]
-        print(eventos)
         return eventos
      except Exception as e:
         print(f"Erro ao obter lista de eventos: {e}")
         return [] 
+
+    def cadastraEvento(self,nome_evento:str, local_evento:str,horario:str, organizadora:str, preco:int, id_usuario:str, base: Base_Dados) -> None:
+        try:
+           cadastro = base.add_evento(nome_evento, local_evento, horario ,organizadora,preco, id_usuario)
+           if(cadastro == True):
+             print("Evento cadastrado com sucesso!")
+             return True
+           else:
+                print(f"Erro ao cadastrar evento")
+                return False
+        except Exception as e:
+            print(f"Erro ao cadastrar evento: {e}")
+            return False
+
+    def obterEventosNome(self,base,nome):
+        try:
+            lista_eventos_tuplas = base.get_evento_nome(nome)
+            eventos = [
+                Evento(*tupla) for tupla in lista_eventos_tuplas
+            ]
+            return eventos
+        except Exception as e:
+            print(f"Erro ao obter lista de eventos: {e}")
+        return [] 
+
 
     def getNome(self):
         return self.evento._getNome()
