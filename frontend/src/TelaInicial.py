@@ -1,9 +1,7 @@
 import tkinter as tk
-from tkinter import messagebox
 from PIL import Image, ImageTk
 import requests
 from ApiClient import ApiClient
-from tkinter import ttk
 import customtkinter as ctk
 from Utils.validador import Validador
 from Components.alerta import Alerta

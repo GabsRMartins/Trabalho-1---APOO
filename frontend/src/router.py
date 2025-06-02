@@ -4,6 +4,8 @@ from TelaMapa import MapPage
 from TelaEventosLocais import EventPage
 from ApiClient import ApiClient
 from TelaCadastraEvento import EventRegister
+from TelaEventoUsuario import UserEvent
+
 class AppRouter(tk.Tk):
     def __init__(self):
         super().__init__()
@@ -19,7 +21,7 @@ class AppRouter(tk.Tk):
 
         self.frames = {}
 
-        for F in (HomePage, MapPage, EventPage, EventRegister):  # Adicione novas páginas aqui
+        for F in (HomePage, MapPage, EventPage, EventRegister,UserEvent):  # Adicione novas páginas aqui
             page_name = F.__name__
             frame = F(parent=container, controller=self)
             self.frames[page_name] = frame

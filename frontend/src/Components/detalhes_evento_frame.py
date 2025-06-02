@@ -97,4 +97,4 @@ class DetalhesEventoFrame(ctk.CTkFrame):
         else:
             self.botao_adicionar.configure(text="➕ Adicionar evento na lista", fg_color="#F44336", hover_color="#D32F2F")
 
-        print("Adicionou")
+    
